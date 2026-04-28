@@ -1,0 +1,25 @@
+services:
+  app:
+    build: .
+    container_name: forms_app
+    ports:
+      - "8080:8080"
+    environment:
+      ConnectionStrings__Database: Host=db;Port=5432;Database=appdb;Username=postgres;Password=postgres
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: appdb
+    ports:
+      - "5455:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MinaroForms.Domain.Forms;
+using MinaroForms.Domain.Users;
 
 namespace MinaroForms.Infrastructure.Persistence.Configurations;
 
@@ -13,6 +14,11 @@ internal sealed class SubmissionConfiguration : IEntityTypeConfiguration<Submiss
 
         builder.Property(submission => submission.SubmittedAt).IsRequired();
         builder.Property(submission => submission.RespondentEmail).HasMaxLength(320);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(submission => submission.RespondentUserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasMany(submission => submission.Answers)
             .WithOne()

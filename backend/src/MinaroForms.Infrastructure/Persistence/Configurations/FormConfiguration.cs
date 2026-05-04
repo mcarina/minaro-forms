@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MinaroForms.Domain.Forms;
+using MinaroForms.Domain.Users;
 
 namespace MinaroForms.Infrastructure.Persistence.Configurations;
 
@@ -27,6 +28,11 @@ internal sealed class FormConfiguration : IEntityTypeConfiguration<Form>
             .WithOne()
             .HasForeignKey(submission => submission.FormId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(form => form.OwnerUserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Navigation(form => form.Questions).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Navigation(form => form.Submissions).UsePropertyAccessMode(PropertyAccessMode.Field);

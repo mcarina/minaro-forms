@@ -4,7 +4,12 @@ services:
     container_name: forms_app
     ports:
       - "8080:8080"
+    volumes:
+      - .:/src
+      - nuget_cache:/root/.nuget/packages
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Database: Host=db;Port=5432;Database=appdb;Username=postgres;Password=postgres
     depends_on:
       - db
@@ -23,3 +28,4 @@ services:
 
 volumes:
   postgres_data:
+  nuget_cache:

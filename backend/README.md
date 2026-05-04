@@ -1,33 +1,152 @@
-# Minaro Forms Backend
+# 🚀 MinaroForms API
 
-Backend inicial em .NET 8 usando Clean Architecture por use case.
+API para gerenciamento de formulários e submissões, construída com .NET 8, PostgreSQL e Docker.
 
-## Camadas
+---
 
-- `MinaroForms.Domain`: entidades e regras centrais.
-- `MinaroForms.Application`: contratos, DTOs e use cases.
-- `MinaroForms.Infrastructure`: EF Core, Postgres, repositories e unit of work.
-- `MinaroForms.Api`: endpoints HTTP finos.
+## 📦 Pré-requisitos
 
-## Rodando
+Antes de começar, instale:
+
+* Docker Desktop (ou Docker Engine + Compose)
+* .NET SDK 8 *(opcional, só se quiser rodar fora do Docker)*
+
+---
+
+## 📥 Clonar o projeto
 
 ```bash
-cd backend
+git clone <URL_DO_REPOSITORIO>
+cd MinaroForms
+```
+
+---
+
+## 🐳 Rodar com Docker (RECOMENDADO)
+
+Subir tudo (API + banco):
+
+```bash
 docker compose up --build
 ```
 
-No scaffold inicial, a API usa `EnsureCreatedAsync` ao subir para criar as tabelas a partir do modelo EF. Quando o domínio estabilizar, o ideal é trocar isso por migrations versionadas.
+---
 
-API:
+## 🌐 Acessos
 
-- `GET /health`
-- `POST /api/forms`
-- `GET /api/forms/{formId}`
-- `POST /api/forms/{formId}/publish`
-- `POST /api/forms/{formId}/submissions`
+Depois que subir:
 
-## Próximos passos naturais
+* API: http://localhost:8080
+* Health check: http://localhost:8080/health
+* Swagger: http://localhost:8080/swagger
 
-- Criar migrations com EF Core.
-- Adicionar autenticação e obter `ownerUserId` do usuário logado.
-- Validar respostas obrigatórias e tipos de pergunta no use case de submissão.
+---
+
+## 🧪 Banco de dados
+
+* Host: `localhost`
+* Porta: `5455`
+* Database: `appdb`
+* User: `postgres`
+* Password: `postgres`
+
+---
+
+## 🔁 Desenvolvimento (Hot Reload)
+
+O projeto já roda com:
+
+```bash
+dotnet watch run
+```
+
+Dentro do container, então:
+
+* Qualquer alteração no código → recompila automático
+* Não precisa rebuild manual
+
+---
+
+## 🧹 Resetar tudo
+
+Apagar containers e volumes:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## ⚠️ Problemas comuns
+
+### ❌ Porta 8080 não abre
+
+Verifique:
+
+```bash
+docker compose ps
+```
+
+Deve aparecer:
+
+```
+0.0.0.0:8080->8080/tcp
+```
+
+---
+
+### ❌ Erro de pacote EFCore.NamingConventions
+
+Instale versão compatível:
+
+```bash
+dotnet add src/MinaroForms.Infrastructure package EFCore.NamingConventions --version 8.0.3
+```
+
+---
+
+### ❌ Swagger não aparece
+
+Verifique se existe no `Program.cs`:
+
+```csharp
+builder.Services.AddSwaggerGen();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+```
+
+---
+
+## 📁 Estrutura do projeto
+
+```
+src/
+ ├── MinaroForms.Api            → endpoints / configuração
+ ├── MinaroForms.Application    → regras de negócio
+ ├── MinaroForms.Domain         → entidades
+ └── MinaroForms.Infrastructure → banco / EF Core
+```
+
+---
+
+## 🧠 Dicas
+
+* Use `/health` para ver se a API está viva
+* Use Swagger para explorar endpoints
+* O banco sobe automaticamente via Docker
+* `EnsureCreated()` cria o banco na primeira execução
+
+---
+
+## 🛑 Parar o projeto
+
+```bash
+Ctrl + C
+```
+
+ou
+
+```bash
+docker compose down
+```

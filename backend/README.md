@@ -149,7 +149,6 @@ src/
 * Use `/health` para ver se a API está viva
 * Use Swagger para explorar endpoints
 * O banco sobe automaticamente via Docker
-* `EnsureCreated()` cria o banco na primeira execução
 
 ---
 

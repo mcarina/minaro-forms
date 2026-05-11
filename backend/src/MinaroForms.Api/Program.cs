@@ -25,11 +25,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-await using (var scope = app.Services.CreateAsyncScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<FormsDbContext>();
-    await dbContext.Database.EnsureCreatedAsync();
-}
+// await using (var scope = app.Services.CreateAsyncScope())
+// {
+//     var dbContext = scope.ServiceProvider.GetRequiredService<FormsDbContext>();
+//     await dbContext.Database.EnsureCreatedAsync();
+// }
 
 app.MapHealthChecks("/health");
 app.MapFormEndpoints();

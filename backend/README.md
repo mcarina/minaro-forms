@@ -52,6 +52,20 @@ Depois que subir:
 
 ---
 
+### 🧪 Banco de dados: migrations
+
+e rode o comando abaixo para criar a migration, dentro de src/src
+```bash
+dotnet ef migrations add <Nome da migration> --project MinaroForms.Infrastructure --startup-project MinaroForms.Api
+```
+
+e depois rode para aplicar a migration no banco
+```bash
+dotnet ef database update --project MinaroForms.Infrastructure --startup-project MinaroForms.Api
+```
+
+---
+
 ## 🔁 Desenvolvimento (Hot Reload)
 
 O projeto já roda com:

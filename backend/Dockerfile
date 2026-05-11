@@ -1,5 +1,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine
 
+RUN dotnet tool install --global dotnet-ef --version 8.0.11
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
 WORKDIR /src
 
 COPY MinaroForms.sln ./

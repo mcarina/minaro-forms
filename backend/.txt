@@ -1,0 +1,3 @@
+fechar as rotas
+login retorna a hash jwt
+ajustar a rota put user para patch

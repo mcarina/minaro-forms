@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MinaroForms.Application.Abstractions;
 using MinaroForms.Infrastructure.Persistence;
+using MinaroForms.Infrastructure.Security;
 
 namespace MinaroForms.Infrastructure;
 
@@ -17,6 +18,8 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
 
         services.AddScoped<IFormRepository, FormRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

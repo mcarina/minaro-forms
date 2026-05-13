@@ -11,3 +11,5 @@ obj/
 .env
 .env.*
 !.env.example
+.codex
+

@@ -1,4 +1,5 @@
 import Filter from "./components/filter";
+import FormsGrid from "./components/formsGrid";
 import Header from "./components/header";
 
 export default function HomePage() {
@@ -7,6 +8,7 @@ export default function HomePage() {
         <Header />
         <div className="p-8">
           <Filter />
+          <FormsGrid />
         </div>
     </div>
   );

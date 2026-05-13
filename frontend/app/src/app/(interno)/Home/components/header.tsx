@@ -27,7 +27,7 @@ export default function Header() {
         </div>
 
         <div className="relative">
-            <UserMenu />    
+            <UserMenu />
         </div>
       </div>
     </header>

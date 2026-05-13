@@ -6,7 +6,7 @@ import { LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function UserMenu() {
-    const router = useRouter();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   return (

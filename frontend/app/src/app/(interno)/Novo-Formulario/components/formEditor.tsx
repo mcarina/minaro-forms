@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { FIELD_TYPES, FieldType, FormField } from "../types/util";
 import { ComponentsSidebar } from "./componentsSideBar";
 import { FormBody } from "./formBody";
+import { PropertiesPanel } from "./PropertiesPanel";
 
 export default function FormEditor() {
     const [title, setTitle] = useState("Novo Formulário")
@@ -12,6 +13,7 @@ export default function FormEditor() {
     const [activeId, setActiveId] = useState<string | null>(null)
     const [fields, setFields] = useState<FormField[]>([])
     const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null)
+    const selectedField = fields.find((f) => f.id === selectedFieldId) || null
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -88,6 +90,16 @@ export default function FormEditor() {
         [selectedFieldId]
     )
 
+  const updateField = useCallback(
+    (updates: Partial<FormField>) => {
+      if (!selectedFieldId) return
+      setFields((prev) =>
+        prev.map((f) => (f.id === selectedFieldId ? { ...f, ...updates } : f))
+      )
+    },
+    [selectedFieldId]
+  )
+  
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-700 flex flex-col">
             <div className="p-8">
@@ -108,6 +120,7 @@ export default function FormEditor() {
                             onSelectField={setSelectedFieldId}
                             onDeleteField={deleteField}
                         />
+                        <PropertiesPanel field={selectedField} onUpdateField={updateField} />
                     </div>
 
                     <DragOverlay>

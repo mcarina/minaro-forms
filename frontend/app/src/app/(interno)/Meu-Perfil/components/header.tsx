@@ -1,0 +1,26 @@
+"use client";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link"
+import UserMenu from "../../Home/components/userMenu";
+
+export default function Header() {
+
+  return (
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-900/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-3">
+            <Link
+                href="/Home"
+                className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            >
+                <ArrowLeft className="w-5 h-5" />
+            </Link>
+        </div>
+
+        <div className="relative">
+          <UserMenu />
+        </div>
+      </div>
+    </header>
+  );
+}

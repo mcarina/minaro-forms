@@ -1,10 +1,13 @@
 "use client";
 import { FileText, Search } from "lucide-react";
-import { useState } from "react";
 import UserMenu from "./userMenu";
 
-export default function Header() {
-  const [searchQuery, setSearchQuery] = useState("");
+interface HeaderProps {
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+}
+
+export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-900/80 backdrop-blur-xl">
@@ -20,14 +23,14 @@ export default function Header() {
               type="text"
               placeholder="Buscar por nome"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => onSearchChange(e.target.value)}
               className="h-10 w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-3 text-white outline-none placeholder:text-violet-300/50 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
             />
           </div>
         </div>
 
         <div className="relative">
-            <UserMenu />
+          <UserMenu />
         </div>
       </div>
     </header>

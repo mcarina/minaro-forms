@@ -93,7 +93,7 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
             value={field.question}
             onChange={(e) => onUpdateField({ question: e.target.value })}
             placeholder="Digite a pergunta"
-            className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500"
+            className="w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-white placeholder:text-slate-500"
           />
         </div>
 
@@ -108,7 +108,7 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
             onChange={(e) => onUpdateField({ description: e.target.value })}
             placeholder="Texto de ajuda para o respondente"
             rows={2}
-            className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 resize-none"
+            className="w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-white placeholder:text-slate-500 resize-none"
           />
         </div>
 
@@ -141,10 +141,11 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
                   <input
                     value={option.label}
                     onChange={(e) => updateOptionLabel(option.id, e.target.value)}
-                    className="flex-1 bg-slate-800/50 border-slate-600 text-white text-sm h-9"
+                    className="h-9 flex-1 rounded-lg border border-slate-600 bg-slate-800/50 px-3 text-sm text-white"
                     placeholder={`Opção ${index + 1}`}
                   />
                   <button
+                    type="button"
                     onClick={() => removeOption(option.id)}
                     className="p-1.5 rounded hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-colors"
                   >
@@ -159,11 +160,12 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
                 onChange={(e) => setNewOption(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addOption()}
                 placeholder="Nova opção"
-                className="flex-1 bg-slate-800/50 border-slate-600 text-white text-sm h-9"
+                className="h-9 flex-1 rounded-lg border border-slate-600 bg-slate-800/50 px-3 text-sm text-white"
               />
               <button
+                type="button"
                 onClick={addOption}
-                className="border-slate-600 text-slate-300 hover:bg-purple-500/20 hover:text-purple-300 hover:border-purple-500/50"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 text-slate-300 hover:bg-purple-500/20 hover:text-purple-300 hover:border-purple-500/50"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -186,7 +188,7 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
                   onChange={(e) =>
                     onUpdateField({ minRating: parseInt(e.target.value) || 1 })
                   }
-                  className="bg-slate-800/50 border-slate-600 text-white h-9"
+                  className="h-9 w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 text-white"
                 />
               </div>
               <div className="flex-1">
@@ -199,7 +201,7 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
                   onChange={(e) =>
                     onUpdateField({ maxRating: parseInt(e.target.value) || 5 })
                   }
-                  className="bg-slate-800/50 border-slate-600 text-white h-9"
+                  className="h-9 w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 text-white"
                 />
               </div>
             </div>

@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { FIELD_TYPES, FieldType, FormField } from "../types/util";
 import { ComponentsSidebar } from "./componentsSideBar";
 import { FormBody } from "./formBody";
+import Header from "./header";
 import { PropertiesPanel } from "./PropertiesPanel";
 
 export default function FormEditor() {
@@ -26,7 +27,7 @@ export default function FormEditor() {
     const createNewField = useCallback((type: FieldType): FormField => {
         const fieldType = FIELD_TYPES.find((f) => f.type === type)
         return {
-            id: `field-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            id: `field-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
             type,
             question: fieldType?.label || "Nova pergunta",
             required: false,
@@ -66,6 +67,7 @@ export default function FormEditor() {
             setFields((prev) => {
                 const oldIndex = prev.findIndex((f) => f.id === active.id)
                 const newIndex = prev.findIndex((f) => f.id === over.id)
+                if (oldIndex === -1 || newIndex === -1) return prev
                 return arrayMove(prev, oldIndex, newIndex)
             })
         }
@@ -101,8 +103,9 @@ export default function FormEditor() {
   )
   
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-700 flex flex-col">
-            <div className="p-8">
+        <>
+            <Header title={title} fieldsCount={fields.length} onTitleChange={setTitle} />
+            <div className="flex-1 p-8">
                 <DndContext
                     sensors={sensors}
                     onDragStart={handleDragStart}
@@ -132,6 +135,6 @@ export default function FormEditor() {
                     </DragOverlay>
                 </DndContext>
             </div>
-        </div>
+        </>
     )
 }

@@ -14,6 +14,7 @@ export function FieldRenderer({ field, isPreview = false }: FieldRendererProps) 
       case "short_text":
         return (
           <input
+            disabled={!isPreview}
             className="w-full rounded-lg bg-slate-800/50 border border-slate-600 px-3 py-2 text-white placeholder:text-slate-500"
           />
         )
@@ -21,6 +22,7 @@ export function FieldRenderer({ field, isPreview = false }: FieldRendererProps) 
       case "long_text":
         return (
             <textarea
+            disabled={!isPreview}
             rows={3}
             className="w-full rounded-lg bg-slate-800/50 border border-slate-600 px-3 py-2 text-white placeholder:text-slate-500 resize-none"
             />
@@ -36,6 +38,8 @@ export function FieldRenderer({ field, isPreview = false }: FieldRendererProps) 
                     type="radio"
                     value={option.id}
                     id={option.id}
+                    name={field.id}
+                    disabled={!isPreview}
                     className="border-slate-500 text-purple-500"
                   />
                   <label htmlFor={option.id} className="text-slate-300 cursor-pointer">
@@ -61,7 +65,7 @@ export function FieldRenderer({ field, isPreview = false }: FieldRendererProps) 
                     type="checkbox"
                     id={option.id}
                     disabled={!isPreview}
-                    className="border-slate-500 data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
+                    className="accent-purple-500"
                   />
                   <label htmlFor={option.id} className="text-slate-300 cursor-pointer">
                     {option.label}
@@ -104,7 +108,7 @@ export function FieldRenderer({ field, isPreview = false }: FieldRendererProps) 
           <input
             type="date"
             disabled={!isPreview}
-            className="bg-slate-800/50 border-slate-600 text-white [color-scheme:dark]"
+            className="rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-white [color-scheme:dark]"
           />
         )
 

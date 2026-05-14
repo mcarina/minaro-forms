@@ -7,6 +7,8 @@ export interface FormItem {
   isFavorite: boolean
 }
 
+export type FormFilter = "all" | "favorites" | "recent"
+
 export const mockForms: FormItem[] = [
   {
     id: "1",

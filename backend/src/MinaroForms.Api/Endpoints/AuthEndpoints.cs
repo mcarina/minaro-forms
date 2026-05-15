@@ -1,3 +1,4 @@
+using MinaroForms.Infrastructure.Security;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -10,45 +11,31 @@ public static class AuthEndpoints
 {
     public static IEndpointRouteBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
     {
-        var auth = app.MapGroup("/api/auth").WithTags("Auth");
+        var auth = app.MapGroup("/api/auth")
+            .WithTags("Auth");
 
         auth.MapPost("/login", async (
             LoginRequest request,
             LoginUseCase useCase,
-            HttpContext httpContext,
+            JwtTokenGenerator jwtGenerator,
             CancellationToken cancellationToken) =>
         {
-            var login = await useCase.ExecuteAsync(request, cancellationToken);
+            var login = await useCase.ExecuteAsync(
+                request,
+                cancellationToken
+            );
+
             if (login is null)
             {
                 return Results.Unauthorized();
             }
 
-            var claims = new[]
+            var token = jwtGenerator.GenerateToken(login.User);
+
+            return Results.Ok(new
             {
-                new Claim(ClaimTypes.NameIdentifier, login.User.Id.ToString()),
-                new Claim(ClaimTypes.Name, login.User.Name),
-                new Claim(ClaimTypes.Email, login.User.Email),
-                new Claim(ClaimTypes.Role, login.User.Role)
-            };
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-            return Results.Ok(login);
-        });
-
-        auth.MapPost("/logout", async (
-            LogoutUseCase useCase,
-            HttpContext httpContext,
-            CancellationToken cancellationToken) =>
-        {
-            await useCase.ExecuteAsync(cancellationToken);
-            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            return Results.NoContent();
+                token
+            });
         });
 
         return app;

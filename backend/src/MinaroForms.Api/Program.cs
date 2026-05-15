@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 using MinaroForms.Api.Endpoints;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,6 +17,7 @@ using MinaroForms.Application.Users.ListUsers;
 using MinaroForms.Application.Users.UpdateUser;
 using MinaroForms.Infrastructure;
 using MinaroForms.Infrastructure.Persistence;
+using MinaroForms.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +40,28 @@ builder.Services
         options.LoginPath = "/api/auth/login";
         options.LogoutPath = "/api/auth/logout";
     });
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+            )
+        };
+    });
+
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<JwtTokenGenerator>();
 builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

@@ -1,3 +1,4 @@
+using MinaroForms.Application.Forms.GetFormsByUser;
 using Microsoft.EntityFrameworkCore;
 using MinaroForms.Application.Abstractions;
 using MinaroForms.Domain.Forms;
@@ -20,4 +21,29 @@ public sealed class FormRepository(FormsDbContext dbContext) : IFormRepository
             .ThenInclude(submission => submission.Answers)
             .FirstOrDefaultAsync(form => form.Id == id, cancellationToken);
     }
+
+    public async Task<List<GetFormsByUserResponse>> GetByUserIdAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Forms
+            .Where(form => form.OwnerUserId == userId)
+            .Select(form => new GetFormsByUserResponse
+            {
+                Id = form.Id,
+
+                Title = form.Title,
+
+                Description = form.Description,
+
+                AnswersCount = form.Submissions.Count,
+
+                LastUpdate = form.UpdatedAt
+                    .ToString("dd/MM/yyyy"),
+
+                IsFavorite = false
+            })
+            .ToListAsync(cancellationToken);
+    }
+
 }

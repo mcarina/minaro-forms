@@ -18,6 +18,7 @@ using MinaroForms.Application.Users.UpdateUser;
 using MinaroForms.Infrastructure;
 using MinaroForms.Infrastructure.Persistence;
 using MinaroForms.Infrastructure.Security;
+using MinaroForms.Application.Forms.GetFormsByUser;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.AddScoped<CreateUserUseCase>();
 builder.Services.AddScoped<GetUserUseCase>();
 builder.Services.AddScoped<ListUsersUseCase>();
 builder.Services.AddScoped<UpdateUserUseCase>();
+builder.Services.AddScoped<GetFormsByUserUseCase>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

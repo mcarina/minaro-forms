@@ -2,6 +2,7 @@ using MinaroForms.Application.Forms.CreateForm;
 using MinaroForms.Application.Forms.GetForm;
 using MinaroForms.Application.Forms.PublishForm;
 using MinaroForms.Application.Submissions.CreateSubmission;
+using MinaroForms.Application.Forms.GetFormsByUser;
 
 namespace MinaroForms.Api.Endpoints;
 
@@ -70,6 +71,29 @@ public static class FormEndpoints
                 return Results.BadRequest(new { error = exception.Message });
             }
         });
+
+        forms.MapGet("/me", async (
+            ClaimsPrincipal user,
+            GetFormsByUserUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var forms = await useCase.ExecuteAsync(
+                userId,
+                cancellationToken
+            );
+
+            return Results.Ok(forms);
+        })
+        .RequireAuthorization();
 
         return app;
     }

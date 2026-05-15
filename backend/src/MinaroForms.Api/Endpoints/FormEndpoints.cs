@@ -3,6 +3,7 @@ using MinaroForms.Application.Forms.GetForm;
 using MinaroForms.Application.Forms.PublishForm;
 using MinaroForms.Application.Submissions.CreateSubmission;
 using MinaroForms.Application.Forms.GetFormsByUser;
+using System.Security.Claims;
 
 namespace MinaroForms.Api.Endpoints;
 

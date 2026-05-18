@@ -2,6 +2,7 @@ using MinaroForms.Application.Users.CreateUser;
 using MinaroForms.Application.Users.GetUser;
 using MinaroForms.Application.Users.ListUsers;
 using MinaroForms.Application.Users.UpdateUser;
+using System.Security.Claims;
 
 namespace MinaroForms.Api.Endpoints;
 
@@ -19,14 +20,30 @@ public static class UserEndpoints
             return Results.Ok(result);
         });
 
-        users.MapGet("/{userId:guid}", async (
-            Guid userId,
+        users.MapGet("/me", async (
+            ClaimsPrincipal user,
             GetUserUseCase useCase,
             CancellationToken cancellationToken) =>
         {
-            var user = await useCase.ExecuteAsync(userId, cancellationToken);
-            return user is null ? Results.NotFound() : Results.Ok(user);
-        });
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var result = await useCase.ExecuteAsync(
+                userId,
+                cancellationToken
+            );
+
+            return result is null
+                ? Results.NotFound()
+                : Results.Ok(result);
+        })
+        .RequireAuthorization();
 
         users.MapPost("/", async (
             CreateUserRequest request,

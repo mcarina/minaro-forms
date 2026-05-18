@@ -1,15 +1,39 @@
 "use client";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getMe} from "../services/getUserId.service";
+
+interface User {
+    id: string
+    name: string
+    email: string
+    role?: string
+    createdAt: string
+    updatedAt: string
+}
 
 export default function FormPerfil() {
-    const [nome, setNome] = useState("Márcia Carina")
-    const [email, setEmail] = useState("marciacarina931@gmail.com")
+    const [user, setUser] = useState<User | null>(null)
+    const [nome, setNome] = useState("")
+    const [email, setEmail] = useState("")
     const [alterandoSenha, setAlterandoSenha] = useState(false)
     const [mostrarSenha, setMostrarSenha] = useState(false)
     const [senhaAtual, setSenhaAtual] = useState("")
     const [novaSenha, setNovaSenha] = useState("")
     const [confirmarSenha, setConfirmarSenha] = useState("")
+
+    useEffect(() => {
+        async function loadUser() {
+            try {
+                const user = await getMe()
+                setUser(user)
+                setNome(user.name)
+                setEmail(user.email)
+            } catch (error) {
+                console.error(error)
+            }
+        } loadUser()
+    }, [])
 
     return (
         <div className="space-y-6">

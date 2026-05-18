@@ -1,13 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LogOut, Settings, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getMe } from "../../Meu-Perfil/services/getUserId.service";
+import { getInitials } from "@/app/utils/getInitials";
+
+interface User {
+    name: string
+}
 
 export default function UserMenu() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null)
+
+    useEffect(() => {
+        async function loadUser() {
+            try {
+                const data = await getMe()
+                setUser(data)
+            } catch (error) {
+                console.error(error)
+            }
+        } loadUser()
+    }, [])
 
   return (
     <div>
@@ -17,11 +35,11 @@ export default function UserMenu() {
         className="flex items-center gap-2 text-violet-200 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition"
       >
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-900 to-purple-600 flex items-center justify-center">
-          <span className="text-sm font-medium text-white">MC</span>
+          <span className="text-sm font-medium text-white">{getInitials(user?.name ?? "")}</span>
         </div>
 
         <span className="hidden sm:inline">
-          Márcia Carina
+          {user?.name}
         </span>
       </button>
 

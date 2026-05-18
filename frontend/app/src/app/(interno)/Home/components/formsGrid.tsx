@@ -1,16 +1,27 @@
 "use client";
 import { Clock, Star, Users } from "lucide-react";
-import { FormFilter, FormItem, mockForms } from "../mocks/mockForms";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormDropdown from "./FormDropdown";
+import { getForms } from "../services/getForms.service";
+
+export type FormFilter = "all" | "favorites" | "recent"
 
 interface FormsGridProps {
     searchQuery: string;
     filter: FormFilter;
 }
 
+interface Form {
+    id: string
+    title: string
+    description: string
+    answersCount: number
+    lastUpdate: string
+    isFavorite: boolean
+}
+
 export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
-    const [forms, setForms] = useState<FormItem[]>(mockForms)
+    const [forms, setForms] = useState<Form[]>([])
     const normalizedSearch = searchQuery.trim().toLowerCase()
     const visibleForms = forms.filter((form, index) => {
         const matchesSearch =
@@ -31,6 +42,18 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
     const deleteForm = (id: string) => {
         setForms((prev) => prev.filter((form) => form.id !== id))
     }
+
+    useEffect(() => {
+        async function loadForms() {
+            try {
+                const data = await getForms()
+                setForms(data)
+            } catch (error) {
+                console.error(error)
+            }
+        } loadForms()
+    }, [])
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {visibleForms.map((form) => (
@@ -61,7 +84,7 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
                         <div className="flex items-center gap-4 text-sm">
                             <div className="flex items-center gap-1.5 text-violet-300">
                                 <Users className="w-4 h-4" />
-                                <span>{form.responses} respostas</span>
+                                <span>{form.answersCount} respostas</span>
                             </div>
                         </div>
                     </div>
@@ -69,7 +92,7 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
                     <footer className="pt-3 border-t border-white/10">
                         <div className="flex items-center gap-1.5 text-xs text-violet-400">
                             <Clock className="w-3.5 h-3.5" />
-                            <span>Editado {form.lastEdited}</span>
+                            <span>Editado {form.lastUpdate}</span>
                         </div>
                     </footer>
                 </div>

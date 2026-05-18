@@ -28,6 +28,7 @@ public sealed class FormRepository(FormsDbContext dbContext) : IFormRepository
     {
         return await dbContext.Forms
             .Where(form => form.OwnerUserId == userId)
+            .OrderByDescending(form => form.UpdatedAt)
             .Select(form => new GetFormsByUserResponse
             {
                 Id = form.Id,

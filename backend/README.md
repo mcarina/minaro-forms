@@ -142,6 +142,115 @@ src/
  └── MinaroForms.Infrastructure → banco / EF Core
 ```
 
+## 🧪 Estrutura das Tabelas no banco
+
+<img width="608" height="561" alt="minaro-forms drawio" src="https://github.com/user-attachments/assets/ac63e0b3-8778-4339-9ffd-fff757652d26" />
+
+---
+```
+users/
+ ── id        → identificador único. È um uuid 
+ ── nome      → nome do usuario
+ ── email     → email do usuario, único
+ ── password  → senha criptografada
+ ── role      → papel do usuário no sistema, sua permissão, padrão "User admin"
+```
+```
+forms/
+ ── id             → identificador único. È um uuid
+ ── owner_user_id  → id do usuario, dono/criador do formulário
+ ── title          → título do formulário
+ ── description    → descrição opcional do formulário
+ ── is_publisehd   → indica se o formulário está publicado ou não
+```
+```
+questions/
+ ── id            → identificador único. È um uuid
+ ── form_id       → id do formulário, indica á qual formulario pertence
+ ── type          → tipo de pergunta, ex: multipla escolha etc. (questionType)
+ ── title         → titulo principal da pergunta
+ ── description   → descrição ou ajuda opcional da pergunta
+ ── is_required   → indica se a pergunta é obrigatória
+ ── position      → ordem da pergunta dentro do formulário
+ ── settings_json → configurações extras da pergunta em json, ùtil para regras específicas por tipo de pergunta
+```
+```
+questions_options/
+ ── id          → identificador único. È um uuid
+ ── question_id → id do pergunta/question, dona dessa opção
+ ── label       → texto exibido para o usuário
+ ── value       → Valor interno salvo quando essa opção é escolhida.
+ ── position    → ordem da opção dentro da pergunta
+```
+```
+submissions/
+ ── id                → identificador único. È um uuid
+ ── form_id           → id do formulário respondido
+ ── submitted_at      → data/hora em que a resposta foi enviada
+ ── respondent_email  → email opcional de quem respondeu (em caso de respotas anônimas)
+ ── respondet_user_id → id_opcional do usuario que respondeu (em caso de respotas anônimas)
+```
+```
+submissions_answers/
+ ── id            → identificador único. È um uuid
+ ── submission_id → id do envio ao qual essa resposta pertence
+ ── question_id   → id da pergunta respondida
+ ── answer_text   → resposta em texto simples
+ ── answer_json   → Resposta em JSON, usada para respostas mais complexas, como múltiplas opções, arquivos, escala, matriz etc.
+```
+>> Em resumo: um usuário(users) cria o formulário (forms); cada formulário(forms) tem várias perguntas (questions); algumas perguntas têm opções(questions_options) ; quando alguém responde, nasce um envio(submissions); e cada resposta de pergunta fica em "enviar pertence á" (submission_answers).
+---
+- duvidas?
+```
+tabela: questions/ coluna: settings_json
+ → configura como a pergunta deve funcionar;
+ → seria uma configuração extra que depende do tipo da pergunta;
+ → Serve para guardar configurações variáveis da pergunta sem precisar criar uma coluna nova para cada tipo.
+ → Exemplos:
+ {
+  "placeholder": "Digite seu nome completo",
+  "minLength": 3,
+  "maxLength": 120
+ }
+
+outro exemplo possivel, pergunta de data
+{
+  "minDate": "2026-01-01",
+  "maxDate": "2026-12-31"
+}
+
+upload de arquivo:
+{
+  "allowedTypes": ["pdf", "png", "jpg"],
+  "maxFileSizeMb": 10
+}
+- Exemplo de registro
+
+| id | form_id | type | title | description | is_required | position | settings_json |
+|---|---|---|---|---|---|---|---|
+| `q1` | `form1` | `short_text` | `Qual seu nome completo?` | `Informe seu nome completo.` | `true` | `1` | `{"placeholder":"Digite seu nome completo","minLength":3,"maxLength":120}` |
+
+```
+
+```
+tabela submission_answers/ coluna: answer_json
+→ Guarda o que a pessoa respondeu
+→ Guarda a resposta quando ela é mais complexa do que um simples texto
+→ answer_text: bom para resposta simples, tipo "Maria Silva".
+→ answer_json: bom para resposta estruturada, tipo múltipla escolha, upload, escala, endereço, lista etc.
+→ Exemplo com pergunta de múltipla escolha:
+
+- Quais tecnologias vocẽ usa?
+[a] React
+[b] Next.js
+[c]PostegreSQL
+|| caso o usuario escolha os trẽs
+
+{
+  "selectedValues": ["react", "nextjs", "postgresql"]
+}
+
+```
 ---
 
 ## 🧠 Dicas

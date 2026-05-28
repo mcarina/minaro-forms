@@ -40,12 +40,22 @@ public static class FormEndpoints
 
         forms.MapPost("/{formId:guid}/publish", async (
             Guid formId,
+            PublishFormRequest request,
             PublishFormUseCase useCase,
+            IConfiguration configuration,
             CancellationToken cancellationToken) =>
         {
             try
             {
-                var form = await useCase.ExecuteAsync(formId, cancellationToken);
+                var frontendBaseUrl = configuration["Frontend:BaseUrl"]
+                    ?? "http://localhost:3000";
+
+                var form = await useCase.ExecuteAsync(
+                    formId,
+                    request,
+                    frontendBaseUrl,
+                    cancellationToken);
+
                 return form is null ? Results.NotFound() : Results.Ok(form);
             }
             catch (InvalidOperationException exception)

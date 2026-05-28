@@ -5,7 +5,11 @@ namespace MinaroForms.Application.Forms.PublishForm;
 
 public sealed class PublishFormUseCase(IFormRepository forms, IUnitOfWork unitOfWork)
 {
-    public async Task<FormResponse?> ExecuteAsync(Guid formId, CancellationToken cancellationToken = default)
+    public async Task<PublishFormResponse?> ExecuteAsync(
+        Guid formId,
+        PublishFormRequest request,
+        string frontendBaseUrl,
+        CancellationToken cancellationToken = default)
     {
         var form = await forms.GetByIdAsync(formId, cancellationToken);
         if (form is null)
@@ -13,9 +17,24 @@ public sealed class PublishFormUseCase(IFormRepository forms, IUnitOfWork unitOf
             return null;
         }
 
-        form.Publish();
+        if (request.IsPublished)
+        {
+            var shareUrl = $"{frontendBaseUrl.TrimEnd('/')}/Formulario/respostas/{form.Id}";
+            form.Publish(shareUrl);
+        }
+        else
+        {
+            form.Unpublish();
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return FormMapping.ToResponse(form);
+        var message = request.IsPublished
+            ? "Publicado com sucesso!"
+            : "Link privado com sucesso!";
+
+        return new PublishFormResponse(
+            message,
+            form.ShareUrl);
     }
 }

@@ -8,6 +8,7 @@ public sealed record FormResponse(
     string Title,
     string? Description,
     bool IsPublished,
+    string? ShareUrl,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
     IReadOnlyCollection<QuestionResponse> Questions);
@@ -34,6 +35,7 @@ public static class FormMapping
             form.Title,
             form.Description,
             form.IsPublished,
+            form.ShareUrl,
             form.CreatedAt,
             form.UpdatedAt,
             form.Questions

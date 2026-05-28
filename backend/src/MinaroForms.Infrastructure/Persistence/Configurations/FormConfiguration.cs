@@ -15,6 +15,12 @@ internal sealed class FormConfiguration : IEntityTypeConfiguration<Form>
         builder.Property(form => form.OwnerUserId).IsRequired();
         builder.Property(form => form.Title).HasMaxLength(200).IsRequired();
         builder.Property(form => form.Description).HasMaxLength(2000);
+
+        builder.Property(x => x.ShareUrl)
+            .HasColumnName("share_url")
+            .HasColumnType("text")
+            .IsRequired(false);
+            
         builder.Property(form => form.IsPublished).IsRequired();
         builder.Property(form => form.CreatedAt).IsRequired();
         builder.Property(form => form.UpdatedAt).IsRequired();

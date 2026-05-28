@@ -7,6 +7,10 @@ public sealed class GetFormsByUserResponse
     public string Title { get; init; } = string.Empty;
 
     public string? Description { get; init; }
+    
+    public bool IsPublished { get; init; }
+
+    public string? ShareUrl { get; init; }
 
     public int AnswersCount { get; init; }
 

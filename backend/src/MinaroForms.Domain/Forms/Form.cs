@@ -15,6 +15,7 @@ public sealed class Form
         OwnerUserId = ownerUserId;
         Title = RequireText(title, nameof(title));
         Description = description;
+        ShareUrl = null;
         IsPublished = false;
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = CreatedAt;
@@ -24,6 +25,7 @@ public sealed class Form
     public Guid OwnerUserId { get; private set; }
     public string Title { get; private set; } = string.Empty;
     public string? Description { get; private set; }
+    public string? ShareUrl { get; private set; }
     public bool IsPublished { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
@@ -50,7 +52,7 @@ public sealed class Form
         return question;
     }
 
-    public void Publish()
+    public void Publish(string shareUrl)
     {
         if (_questions.Count == 0)
         {
@@ -58,6 +60,16 @@ public sealed class Form
         }
 
         IsPublished = true;
+        ShareUrl = string.IsNullOrWhiteSpace(ShareUrl)
+            ? RequireText(shareUrl, nameof(shareUrl))
+            : ShareUrl;
+
+        Touch();
+    }
+
+    public void Unpublish()
+    {
+        IsPublished = false;
         Touch();
     }
 

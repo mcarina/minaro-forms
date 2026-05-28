@@ -36,6 +36,10 @@ public sealed class FormRepository(FormsDbContext dbContext) : IFormRepository
                 Title = form.Title,
 
                 Description = form.Description,
+                
+                IsPublished = form.IsPublished,
+
+                ShareUrl = form.ShareUrl,
 
                 AnswersCount = form.Submissions.Count,
 

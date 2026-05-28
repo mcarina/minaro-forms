@@ -9,16 +9,65 @@ import {
   PenLine,
   Trash2,
 } from "lucide-react";
+import { publishForm } from "../services/Forms.service";
+import ModalPublished from "./modalPublished";
 
 interface FormDropdownProps {
-  onDelete: () => void;
+  formId: string
+  isPublished: boolean
+  shareUrl: string | null
+  onDelete: () => void
+  onPublishedChange: (
+    formId: string,
+    isPublished: boolean,
+    shareUrl: string | null
+  ) => void
 }
 
 export default function FormDropdown({
+  formId,
+  isPublished,
+  shareUrl,
   onDelete,
+  onPublishedChange,
 }: FormDropdownProps) {
   const [open, setOpen] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  const [currentShareUrl, setCurrentShareUrl] = useState(shareUrl)
+  const [currentIsPublished, setCurrentIsPublished] = useState(isPublished)
+  const [message, setMessage] = useState("")
 
+  const handlePublishToggle = async () => {
+    try {
+      setPublishing(true)
+      setMessage("")
+
+      const nextStatus = !currentIsPublished
+
+      const response = await publishForm(formId, {
+        isPublished: nextStatus,
+      })
+
+      setCurrentIsPublished(nextStatus)
+      setCurrentShareUrl(response.shareUrl)
+      setMessage(response.message)
+
+      onPublishedChange(formId, nextStatus, response.shareUrl)
+    } catch (error) {
+      console.error(error)
+      setMessage("Erro ao atualizar compartilhamento.")
+    } finally {
+      setPublishing(false)
+    }
+  }
+
+  const handleCopyLink = async () => {
+    if (!currentShareUrl) return
+
+    await navigator.clipboard.writeText(currentShareUrl)
+    setMessage("Link copiado!")
+  }
   return (
     <div className="relative">
       <button
@@ -31,7 +80,7 @@ export default function FormDropdown({
 
       {open && (
         <div className="absolute right-0 mt-2 w-52 rounded-xl border border-white/10 bg-slate-800 shadow-xl overflow-hidden z-50">
-          
+
           <button type="button" className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition">
             <PenLine className="w-4 h-4 mr-2" />
             Editar
@@ -42,7 +91,14 @@ export default function FormDropdown({
             Duplicar
           </button>
 
-          <button type="button" className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition">
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false)
+              setShowShareModal(true)
+            }}
+            className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition"
+          >
             <ExternalLink className="w-4 h-4 mr-2" />
             Compartilhar
           </button>
@@ -64,6 +120,18 @@ export default function FormDropdown({
           </button>
         </div>
       )}
+
+      <ModalPublished
+        open={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        currentIsPublished={currentIsPublished}
+        currentShareUrl={currentShareUrl}
+        publishing={publishing}
+        message={message}
+        onPublishToggle={handlePublishToggle}
+        onCopyLink={handleCopyLink}
+      />
+
     </div>
   );
 }

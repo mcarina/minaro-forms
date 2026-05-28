@@ -2,7 +2,7 @@
 import { Clock, Star, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import FormDropdown from "./FormDropdown";
-import { getForms } from "../services/getForms.service";
+import { getForms } from "../services/Forms.service";
 import { useRouter } from "next/navigation"
 
 export type FormFilter = "all" | "favorites" | "recent"
@@ -19,6 +19,8 @@ interface Form {
     answersCount: number
     lastUpdate: string
     isFavorite: boolean
+    isPublished: boolean
+    shareUrl: string | null
 }
 
 export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
@@ -45,6 +47,19 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
         setForms((prev) => prev.filter((form) => form.id !== id))
     }
 
+    const updatePublishState = (
+        formId: string,
+        isPublished: boolean,
+        shareUrl: string | null
+    ) => {
+        setForms((prev) =>
+            prev.map((form) =>
+                form.id === formId
+                    ? { ...form, isPublished, shareUrl }
+                    : form
+            )
+        )
+    }
     useEffect(() => {
         async function loadForms() {
             try {
@@ -82,7 +97,13 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
                                 <Star className={`w-4 h-4 ${form.isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
                             </button>
                             <div onClick={(e) => e.stopPropagation()}>
-                                <FormDropdown onDelete={() => deleteForm(form.id)} />
+                                <FormDropdown
+                                    formId={form.id}
+                                    isPublished={form.isPublished}
+                                    shareUrl={form.shareUrl}
+                                    onDelete={() => deleteForm(form.id)}
+                                    onPublishedChange={updatePublishState}
+                                />
                             </div>
                         </div>
                     </header>

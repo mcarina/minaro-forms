@@ -6,9 +6,11 @@ interface HeaderProps {
     title: string;
     fieldsCount: number;
     onTitleChange: (title: string) => void;
+    onSave: () => void
+    saving: boolean
 }
 
-export default function Header({ title, fieldsCount, onTitleChange }: HeaderProps) {
+export default function Header({ title, fieldsCount, onTitleChange, onSave, saving }: HeaderProps) {
     return (
         <div>
             <header className="h-16 bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-4">
@@ -39,9 +41,14 @@ export default function Header({ title, fieldsCount, onTitleChange }: HeaderProp
                         visualizar
                     </button>
 
-                    <button type="button" className="flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                        <Save className="w-4 h-4 mr-2"/>
-                        Salvar
+                    <button
+                        type="button"
+                        onClick={onSave}
+                        disabled={saving}
+                        className="flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white disabled:opacity-50"
+                    >
+                        <Save className="w-4 h-4 mr-2" />
+                        {saving ? "Salvando..." : "Salvar"}
                     </button>
                 </div>
             </header>

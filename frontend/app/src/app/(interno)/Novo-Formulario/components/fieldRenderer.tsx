@@ -1,6 +1,5 @@
 "use client"
 
-import { Star } from "lucide-react"
 import { FormField } from "../types/util"
 
 interface FieldRendererProps {
@@ -28,80 +27,49 @@ export function FieldRenderer({ field, isPreview = false }: FieldRendererProps) 
             />
         )
 
-      case "multiple_choice":
+      case "email":
         return (
-          <div className="space-y-2">
-            {field.options && field.options.length > 0 ? (
-              field.options.map((option) => (
-                <div key={option.id} className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    value={option.id}
-                    id={option.id}
-                    name={field.id}
-                    disabled={!isPreview}
-                    className="border-slate-500 text-purple-500"
-                  />
-                  <label htmlFor={option.id} className="text-slate-300 cursor-pointer">
-                    {option.label}
-                  </label>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-slate-500 italic">
-                Adicione opções no painel de propriedades
-              </p>
-            )}
-          </div>
-        )
-
-      case "checkbox":
-        return (
-          <div className="space-y-2">
-            {field.options && field.options.length > 0 ? (
-              field.options.map((option) => (
-                <div key={option.id} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id={option.id}
-                    disabled={!isPreview}
-                    className="accent-purple-500"
-                  />
-                  <label htmlFor={option.id} className="text-slate-300 cursor-pointer">
-                    {option.label}
-                  </label>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-slate-500 italic">
-                Adicione opções no painel de propriedades
-              </p>
-            )}
-          </div>
-        )
-
-      case "dropdown":
-        return (
-            <select
+          <input
+            type="email"
             disabled={!isPreview}
-            className="w-full rounded-lg bg-slate-800 border border-slate-600 px-3 py-2 text-white"
-            >
-            {field.options && field.options.length > 0 ? (
-                field.options.map((option) => (
-                <option
-                    key={option.id}
-                    value={option.id}
-                >
-                    {option.label}
-                </option>
-                ))
-            ) : (
-                <option disabled>
-                Adicione opções no painel
-                </option>
-            )}
-            </select>
+            className="w-full rounded-lg bg-slate-800/50 border border-slate-600 px-3 py-2 text-white placeholder:text-slate-500"
+          />
         )
+
+      case "number":
+        return (
+          <input
+            type="number"
+            disabled={!isPreview}
+            className="w-full rounded-lg bg-slate-800/50 border border-slate-600 px-3 py-2 text-white placeholder:text-slate-500"
+          />
+        )
+
+    case "multiple_choice":
+      return (
+        <div className="space-y-2">
+          {field.options && field.options.length > 0 ? (
+            field.options.map((option) => (
+              <div key={option.id} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  value={option.value}
+                  id={option.id}
+                  disabled={!isPreview}
+                  className="accent-purple-500"
+                />
+                <label htmlFor={option.id} className="text-slate-300 cursor-pointer">
+                  {option.label}
+                </label>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-slate-500 italic">
+              Adicione opções no painel de propriedades
+            </p>
+          )}
+        </div>
+      )
 
       case "date":
         return (
@@ -110,27 +78,6 @@ export function FieldRenderer({ field, isPreview = false }: FieldRendererProps) 
             disabled={!isPreview}
             className="rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-white [color-scheme:dark]"
           />
-        )
-
-      case "rating":
-        const min = field.minRating || 1
-        const max = field.maxRating || 5
-        return (
-          <div className="flex items-center gap-1">
-            {Array.from({ length: max - min + 1 }, (_, i) => i + min).map((num) => (
-              <button
-                key={num}
-                type="button"
-                disabled={!isPreview}
-                className="p-1 text-slate-500 hover:text-yellow-400 transition-colors disabled:hover:text-slate-500"
-              >
-                <Star className="w-6 h-6" />
-              </button>
-            ))}
-            <span className="ml-2 text-xs text-slate-500">
-              {min} - {max}
-            </span>
-          </div>
         )
 
       default:

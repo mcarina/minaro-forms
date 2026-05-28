@@ -7,9 +7,9 @@ import {
   AlignLeft,
   CircleDot,
   CheckSquare,
-  ChevronDown,
   Calendar,
-  Star,
+  Hash,
+  Mail,
 } from "lucide-react"
 import { FIELD_TYPES, FieldType } from "../types/util"
 
@@ -18,9 +18,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   AlignLeft,
   CircleDot,
   CheckSquare,
-  ChevronDown,
   Calendar,
-  Star,
+  Hash,
+  Mail,
 }
 
 interface DraggableFieldProps {

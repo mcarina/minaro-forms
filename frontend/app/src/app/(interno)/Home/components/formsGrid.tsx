@@ -26,7 +26,7 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
     const visibleForms = forms.filter((form, index) => {
         const matchesSearch =
             form.title.toLowerCase().includes(normalizedSearch) ||
-            form.description.toLowerCase().includes(normalizedSearch)
+            (form.description ?? "").toLowerCase().includes(normalizedSearch)
         const matchesFilter =
             filter === "all" ||
             (filter === "favorites" && form.isFavorite) ||

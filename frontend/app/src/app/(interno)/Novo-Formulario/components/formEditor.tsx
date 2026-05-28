@@ -1,20 +1,26 @@
 "use client";
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable"
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FIELD_TYPES, FieldType, FormField } from "../types/util";
 import { ComponentsSidebar } from "./componentsSideBar";
 import { FormBody } from "./formBody";
 import Header from "./header";
 import { PropertiesPanel } from "./PropertiesPanel";
+import { getMe } from "../../Meu-Perfil/services/getUserId.service";
+import { createForm } from "../services/form.service";
+import { useRouter } from "next/navigation"
 
 export default function FormEditor() {
+    const router = useRouter()
     const [title, setTitle] = useState("Novo Formulário")
     const [description, setDescription] = useState("")
     const [activeId, setActiveId] = useState<string | null>(null)
     const [fields, setFields] = useState<FormField[]>([])
     const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null)
     const selectedField = fields.find((f) => f.id === selectedFieldId) || null
+    const [ownerUserId, setOwnerUserId] = useState<string | null>(null)
+    const [saving, setSaving] = useState(false)
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -24,6 +30,19 @@ export default function FormEditor() {
         })
     )
 
+    useEffect(() => {
+        async function loadUser() {
+            try {
+                const user = await getMe()
+                setOwnerUserId(user.id)
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
+        loadUser()
+    }, [])
+
     const createNewField = useCallback((type: FieldType): FormField => {
         const fieldType = FIELD_TYPES.find((f) => f.type === type)
         return {
@@ -32,14 +51,12 @@ export default function FormEditor() {
             question: fieldType?.label || "Nova pergunta",
             required: false,
             options:
-                type === "multiple_choice" || type === "checkbox" || type === "dropdown"
+                type === "multiple_choice"
                     ? [
-                        { id: `option-${Date.now()}-1`, label: "Opção 1" },
-                        { id: `option-${Date.now()}-2`, label: "Opção 2" },
+                        { id: `option-${Date.now()}-1`, label: "Opção 1", value: "opcao_1" },
+                        { id: `option-${Date.now()}-2`, label: "Opção 2", value: "opcao_2" },
                     ]
                     : undefined,
-            minRating: type === "rating" ? 1 : undefined,
-            maxRating: type === "rating" ? 5 : undefined,
         }
     }, [])
 
@@ -92,19 +109,74 @@ export default function FormEditor() {
         [selectedFieldId]
     )
 
-  const updateField = useCallback(
-    (updates: Partial<FormField>) => {
-      if (!selectedFieldId) return
-      setFields((prev) =>
-        prev.map((f) => (f.id === selectedFieldId ? { ...f, ...updates } : f))
-      )
-    },
-    [selectedFieldId]
-  )
-  
+    const updateField = useCallback(
+        (updates: Partial<FormField>) => {
+            if (!selectedFieldId) return
+            setFields((prev) =>
+                prev.map((f) => (f.id === selectedFieldId ? { ...f, ...updates } : f))
+            )
+        },
+        [selectedFieldId]
+    )
+
+    const questionTypeMap = {
+        short_text: 1,
+        long_text: 2,
+        multiple_choice: 4,
+        email: 5,
+        number: 6,
+        date: 7,
+    } as const
+
+    const buildPayload = () => {
+        if (!ownerUserId) {
+            throw new Error("Usuário não encontrado")
+        }
+
+        return {
+            ownerUserId,
+            title,
+            description: description || null,
+            questions: fields.map((field) => ({
+                type: questionTypeMap[field.type],
+                title: field.question,
+                description: field.description || null,
+                isRequired: field.required,
+                settings: null,
+                options:
+                    field.options?.map((option) => ({
+                        label: option.label,
+                        value: option.value,
+                    })) ?? null,
+            })),
+        }
+    }
+
+    const handleSave = async () => {
+        try {
+            setSaving(true)
+
+            const payload = buildPayload()
+            const createdForm = await createForm(payload)
+            router.push("/Home")
+            console.log("Formulário salvo:")
+            
+        } catch (error) {
+            console.error("Erro ao salvar formulário:", error)
+        } finally {
+            setSaving(false)
+        }
+    }
+
     return (
         <>
-            <Header title={title} fieldsCount={fields.length} onTitleChange={setTitle} />
+            <Header
+                title={title}
+                fieldsCount={fields.length}
+                onTitleChange={setTitle}
+                onSave={handleSave}
+                saving={saving}
+            />
             <div className="flex-1 p-8">
                 <DndContext
                     sensors={sensors}

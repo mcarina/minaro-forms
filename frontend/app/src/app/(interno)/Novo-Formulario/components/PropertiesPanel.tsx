@@ -43,14 +43,13 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
   }
 
   const fieldType = FIELD_TYPES.find((f) => f.type === field.type)
-  const hasOptions = ["multiple_choice", "checkbox", "dropdown"].includes(field.type)
-  const hasRating = field.type === "rating"
-
+  const hasOptions = field.type === "multiple_choice"
   const addOption = () => {
     if (!newOption.trim()) return
     const option: FieldOption = {
       id: `option-${Date.now()}`,
       label: newOption.trim(),
+      value: newOption.trim().toLowerCase().replace(/\s+/g, "_"),
     }
     onUpdateField({
       options: [...(field.options || []), option],
@@ -130,7 +129,7 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
           />
         </div>
 
-        {/* Options for multiple choice, checkbox, dropdown */}
+        {/* Options for single and multiple choice */}
         {hasOptions && (
           <div className="space-y-3">
             <label className="text-slate-300">Opções</label>
@@ -169,41 +168,6 @@ export function PropertiesPanel({ field, onUpdateField }: PropertiesPanelProps) 
               >
                 <Plus className="w-4 h-4" />
               </button>
-            </div>
-          </div>
-        )}
-
-        {/* Rating range */}
-        {hasRating && (
-          <div className="space-y-3">
-            <label className="text-slate-300">Escala</label>
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <label className="text-xs text-slate-500">Mínimo</label>
-                <input
-                  type="number"
-                  min={0}
-                  max={10}
-                  value={field.minRating || 1}
-                  onChange={(e) =>
-                    onUpdateField({ minRating: parseInt(e.target.value) || 1 })
-                  }
-                  className="h-9 w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 text-white"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-xs text-slate-500">Máximo</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={field.maxRating || 5}
-                  onChange={(e) =>
-                    onUpdateField({ maxRating: parseInt(e.target.value) || 5 })
-                  }
-                  className="h-9 w-full rounded-lg border border-slate-600 bg-slate-800/50 px-3 text-white"
-                />
-              </div>
             </div>
           </div>
         )}

@@ -146,6 +146,41 @@ src/
 
 <img width="608" height="561" alt="minaro-forms drawio" src="https://github.com/user-attachments/assets/ac63e0b3-8778-4339-9ffd-fff757652d26" />
 
+```
+users/
+ ── id        → identificador único. È um uuid 
+ ── nome      → nome do usuario
+ ── email     → email do usuario, único
+ ── password  → senha criptografada
+ ── role      → papel do usuário no sistema, sua permissão, padrão "User admin"
+```
+```
+forms/
+ ── id             → identificador único. È um uuid
+ ── owner_user_id  → id do usuario, dono/criador do formulário
+ ── title          → título do formulário
+ ── description    → descrição opcional do formulário
+ ── is_publisehd   → indica se o formulário está publicado ou não
+```
+```
+questions/
+ ── id            → identificador único. È um uuid
+ ── form_id       → id do formulário, indica á qual formulario pertence
+ ── type          → tipo de pergunta, ex: multipla escolha etc. (questionType)
+ ── title         → titulo principal da pergunta
+ ── description   → descrição ou ajuda opcional da pergunta
+ ── is_required   → indica se a pergunta é obrigatória
+ ── position      → ordem da pergunta dentro do formulário
+ ── settings_json → configurações extras da pergunta em json, ùtil para regras específicas por tipo de pergunta
+```
+```
+questions_options/
+ ── id          → identificador único. È um uuid
+ ── question_id → id do pergunta/question, dona dessa opção
+ ── label       → texto exibido para o usuário
+ ── value       → Valor interno salvo quando essa opção é escolhida.
+ ── position    → ordem da opção dentro da pergunta
+```
 ---
 
 ## 🧠 Dicas

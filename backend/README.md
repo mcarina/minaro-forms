@@ -198,13 +198,14 @@ submissions_answers/
  ── answer_text   → resposta em texto simples
  ── answer_json   → Resposta em JSON, usada para respostas mais complexas, como múltiplas opções, arquivos, escala, matriz etc.
 ```
->> Em resumo: um usuário(users) cria o formulário (forms); cada formulário(forms) tem várias perguntas (questions); algumas perguntas têm opções(questions_options) ; quando alguém responde, nasce uma envio(submissions); e cada resposta de pergunta fica em "enviar pertence á" (submission_answers).
+>> Em resumo: um usuário(users) cria o formulário (forms); cada formulário(forms) tem várias perguntas (questions); algumas perguntas têm opções(questions_options) ; quando alguém responde, nasce um envio(submissions); e cada resposta de pergunta fica em "enviar pertence á" (submission_answers).
 ---
 - duvidas?
 ```
-tabela: questions/ coluna: settings_json 
- → seria uma configuração extra que depende do tipo da pergunta.
- → Serve para guardar configurações variáveis da pergunta sem precisar criar uma coluna nova para cada tipo
+tabela: questions/ coluna: settings_json
+ → configura como a pergunta deve funcionar;
+ → seria uma configuração extra que depende do tipo da pergunta;
+ → Serve para guardar configurações variáveis da pergunta sem precisar criar uma coluna nova para cada tipo.
  → Exemplos:
  {
   "placeholder": "Digite seu nome completo",
@@ -228,6 +229,26 @@ upload de arquivo:
 | id | form_id | type | title | description | is_required | position | settings_json |
 |---|---|---|---|---|---|---|---|
 | `q1` | `form1` | `short_text` | `Qual seu nome completo?` | `Informe seu nome completo.` | `true` | `1` | `{"placeholder":"Digite seu nome completo","minLength":3,"maxLength":120}` |
+
+```
+
+```
+tabela submission_answers/ coluna: answer_json
+→ Guarda o que a pessoa respondeu
+→ Guarda a resposta quando ela é mais complexa do que um simples texto
+→ answer_text: bom para resposta simples, tipo "Maria Silva".
+→ answer_json: bom para resposta estruturada, tipo múltipla escolha, upload, escala, endereço, lista etc.
+→ Exemplo com pergunta de múltipla escolha:
+
+- Quais tecnologias vocẽ usa?
+[a] React
+[b] Next.js
+[c]PostegreSQL
+|| caso o usuario escolha os trẽs
+
+{
+  "selectedValues": ["react", "nextjs", "postgresql"]
+}
 
 ```
 ---

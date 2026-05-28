@@ -192,10 +192,10 @@ submissions/
 ```
 submissions_answers/
  ── id            → identificador único. È um uuid
- ── submission_id → id do formulário respondido
- ── question_id   → data/hora em que a resposta foi enviada
- ── answer_text   → email opcional de quem respondeu (em caso de respotas anônimas)
- ── answer_json   → id_opcional do usuario que respondeu (em caso de respotas anônimas)
+ ── submission_id → id do envio ao qual essa resposta pertence
+ ── question_id   → id da pergunta respondida
+ ── answer_text   → resposta em texto simples
+ ── answer_json   → Resposta em JSON, usada para respostas mais complexas, como múltiplas opções, arquivos, escala, matriz etc.
 ```
 >> Em resumo: um usuário(users) cria o formulário (forms); cada formulário(forms) tem várias perguntas (questions); algumas perguntas têm opções(questions_options) ; quando alguém responde, nasce uma envio(submissions); e cada resposta de pergunta fica em "enviar pertence á" (submission_answers).
 ---

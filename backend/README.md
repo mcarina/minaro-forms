@@ -146,6 +146,7 @@ src/
 
 <img width="608" height="561" alt="minaro-forms drawio" src="https://github.com/user-attachments/assets/ac63e0b3-8778-4339-9ffd-fff757652d26" />
 
+---
 ```
 users/
  ── id        → identificador único. È um uuid 
@@ -198,6 +199,37 @@ submissions_answers/
  ── answer_json   → Resposta em JSON, usada para respostas mais complexas, como múltiplas opções, arquivos, escala, matriz etc.
 ```
 >> Em resumo: um usuário(users) cria o formulário (forms); cada formulário(forms) tem várias perguntas (questions); algumas perguntas têm opções(questions_options) ; quando alguém responde, nasce uma envio(submissions); e cada resposta de pergunta fica em "enviar pertence á" (submission_answers).
+---
+- duvidas?
+```
+tabela: questions/ coluna: settings_json 
+ → seria uma configuração extra que depende do tipo da pergunta.
+ → Serve para guardar configurações variáveis da pergunta sem precisar criar uma coluna nova para cada tipo
+ → Exemplos:
+ {
+  "placeholder": "Digite seu nome completo",
+  "minLength": 3,
+  "maxLength": 120
+ }
+
+outro exemplo possivel, pergunta de data
+{
+  "minDate": "2026-01-01",
+  "maxDate": "2026-12-31"
+}
+
+upload de arquivo:
+{
+  "allowedTypes": ["pdf", "png", "jpg"],
+  "maxFileSizeMb": 10
+}
+- Exemplo de registro
+
+| id | form_id | type | title | description | is_required | position | settings_json |
+|---|---|---|---|---|---|---|---|
+| `q1` | `form1` | `short_text` | `Qual seu nome completo?` | `Informe seu nome completo.` | `true` | `1` | `{"placeholder":"Digite seu nome completo","minLength":3,"maxLength":120}` |
+
+```
 ---
 
 ## 🧠 Dicas

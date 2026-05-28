@@ -181,6 +181,23 @@ questions_options/
  ── value       → Valor interno salvo quando essa opção é escolhida.
  ── position    → ordem da opção dentro da pergunta
 ```
+```
+submissions/
+ ── id                → identificador único. È um uuid
+ ── form_id           → id do formulário respondido
+ ── submitted_at      → data/hora em que a resposta foi enviada
+ ── respondent_email  → email opcional de quem respondeu (em caso de respotas anônimas)
+ ── respondet_user_id → id_opcional do usuario que respondeu (em caso de respotas anônimas)
+```
+```
+submissions_answers/
+ ── id            → identificador único. È um uuid
+ ── submission_id → id do formulário respondido
+ ── question_id   → data/hora em que a resposta foi enviada
+ ── answer_text   → email opcional de quem respondeu (em caso de respotas anônimas)
+ ── answer_json   → id_opcional do usuario que respondeu (em caso de respotas anônimas)
+```
+>> Em resumo: um usuário(users) cria o formulário (forms); cada formulário(forms) tem várias perguntas (questions); algumas perguntas têm opções(questions_options) ; quando alguém responde, nasce uma envio(submissions); e cada resposta de pergunta fica em "enviar pertence á" (submission_answers).
 ---
 
 ## 🧠 Dicas

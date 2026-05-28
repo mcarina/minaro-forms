@@ -8,7 +8,7 @@ import { FormBody } from "./formBody";
 import Header from "./header";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { getMe } from "../../Meu-Perfil/services/getUserId.service";
-import { createForm } from "../services/form.service";
+import { createForm } from "../services/createform.service";
 import { useRouter } from "next/navigation"
 
 export default function FormEditor() {

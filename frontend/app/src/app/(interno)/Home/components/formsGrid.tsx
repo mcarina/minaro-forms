@@ -3,6 +3,7 @@ import { Clock, Star, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import FormDropdown from "./FormDropdown";
 import { getForms } from "../services/getForms.service";
+import { useRouter } from "next/navigation"
 
 export type FormFilter = "all" | "favorites" | "recent"
 
@@ -21,6 +22,7 @@ interface Form {
 }
 
 export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
+    const router = useRouter()
     const [forms, setForms] = useState<Form[]>([])
     const normalizedSearch = searchQuery.trim().toLowerCase()
     const visibleForms = forms.filter((form, index) => {
@@ -59,6 +61,7 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
             {visibleForms.map((form) => (
                 <div
                     key={form.id}
+                    onClick={() => router.push(`/Formulario/${form.id}`)}
                     className="rounded-xl border border-white/10 bg-slate-900/70 p-6 shadow-lg group transition-all duration-300 overflow-visible"
                 >
                     <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500" />
@@ -70,13 +73,17 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
                         <div className="flex items-center gap-1 ml-2">
                             <button
                                 type="button"
-                                onClick={() => toggleFavorite(form.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    toggleFavorite(form.id)
+                                }}
                                 className="flex h-8 w-8 items-center justify-center rounded-lg text-violet-300 hover:text-yellow-400 hover:bg-white/10"
                             >
                                 <Star className={`w-4 h-4 ${form.isFavorite ? "fill-yellow-400 text-yellow-400" : ""}`} />
                             </button>
-
-                            <FormDropdown onDelete={() => deleteForm(form.id)} />
+                            <div onClick={(e) => e.stopPropagation()}>
+                                <FormDropdown onDelete={() => deleteForm(form.id)} />
+                            </div>
                         </div>
                     </header>
 

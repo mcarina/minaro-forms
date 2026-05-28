@@ -142,6 +142,10 @@ src/
  └── MinaroForms.Infrastructure → banco / EF Core
 ```
 
+## 🧪 Estrutura das Tabelas no banco
+
+<img width="608" height="561" alt="minaro-forms drawio" src="https://github.com/user-attachments/assets/ac63e0b3-8778-4339-9ffd-fff757652d26" />
+
 ---
 
 ## 🧠 Dicas

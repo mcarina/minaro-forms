@@ -122,7 +122,7 @@ export default function ResponderFormularioPage() {
       console.log("Resposta enviada:", api)
 
       setMessage("Resposta enviada com sucesso!")
-      router.push(`/respostas/${form.id}/obrigado`)
+      router.push(`/Formulario/respostas/${form.id}/obrigado`)
     } catch (error) {
       console.error(error)
       setMessage("Erro ao enviar resposta.")
@@ -144,13 +144,13 @@ export default function ResponderFormularioPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 p-8 text-white">
+    <main className="min-h-screen p-8">
       <div className="mx-auto max-w-2xl space-y-6">
-        <header className="rounded-lg border border-purple-500/30 bg-slate-900 p-6">
+        <header className="rounded-lg border border-purple-500/30 p-6">
           <h1 className="text-2xl font-bold">{form.title}</h1>
 
           {form.description && (
-            <p className="mt-2 text-slate-300">{form.description}</p>
+            <p className="mt-2">{form.description}</p>
           )}
         </header>
 
@@ -160,7 +160,7 @@ export default function ResponderFormularioPage() {
             .map((question) => (
               <section
                 key={question.id}
-                className="rounded-lg border border-slate-700 bg-slate-900 p-5"
+                className="rounded-lg border border-purple-500/30 p-5"
               >
                 <label className="block font-medium">
                   {question.title}
@@ -170,7 +170,7 @@ export default function ResponderFormularioPage() {
                 </label>
 
                 {question.description && (
-                  <p className="mt-1 text-sm text-slate-400">
+                  <p className="mt-1 text-sm text-slate-600">
                     {question.description}
                   </p>
                 )}
@@ -219,7 +219,7 @@ function renderQuestion({
         <input
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(question.id, e.target.value)}
-          className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2"
+          className="w-full rounded-lg border border-slate-400 px-3 py-2"
         />
       )
 
@@ -229,7 +229,7 @@ function renderQuestion({
           rows={4}
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(question.id, e.target.value)}
-          className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2"
+          className="w-full rounded-lg border border-slate-400 px-3 py-2"
         />
       )
 
@@ -256,7 +256,7 @@ function renderQuestion({
           type="email"
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(question.id, e.target.value)}
-          className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2"
+          className="w-full rounded-lg border border-slate-400 px-3 py-2"
         />
       )
 
@@ -266,7 +266,7 @@ function renderQuestion({
           type="number"
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(question.id, e.target.value)}
-          className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2"
+          className="w-full rounded-lg border border-slate-400 px-3 py-2"
         />
       )
 
@@ -276,11 +276,11 @@ function renderQuestion({
           type="date"
           value={typeof value === "string" ? value : ""}
           onChange={(e) => onChange(question.id, e.target.value)}
-          className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 [color-scheme:dark]"
+          className="rounded-lg border border-slate-400 px-3 py-2 [color-scheme:dark]"
         />
       )
 
     default:
-      return <p className="text-sm text-slate-400">Tipo não suportado.</p>
+      return <p className="text-sm text-slate-700">Tipo não suportado.</p>
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 import { Clock, FolderOpen, Plus, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FormFilter } from "../mocks/mockForms";
+import { FormFilter } from "./formsGrid";
 
 interface FilterProps {
     filter: FormFilter;
@@ -48,7 +48,7 @@ export default function Filter({ filter, onFilterChange }: FilterProps) {
             <div className="ml-auto">
                 <button
                 onClick={() => router.push("/Novo-Formulario")} 
-                className="flex items-center pl-4 pr-4 pt-2 pb-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                className="flex items-center pl-4 pr-4 pt-2 pb-2 rounded-lg bg-gradient-to-r from-blue-700 to-purple-800 text-white">
                     <Plus className="w-5 h-5 mr-2"/>
                     Novo Formulário
                 </button>

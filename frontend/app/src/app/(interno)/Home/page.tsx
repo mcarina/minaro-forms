@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import Filter from "./components/filter";
-import FormsGrid from "./components/formsGrid";
+import FormsGrid, { FormFilter } from "./components/formsGrid";
 import Header from "./components/header";
-import { FormFilter } from "./mocks/mockForms";
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");

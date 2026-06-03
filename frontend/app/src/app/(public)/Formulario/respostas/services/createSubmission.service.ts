@@ -17,6 +17,6 @@ export async function createSubmission(
   payload: CreateSubmissionPayload
 ) {
   const response = await api.post(`/forms/${formId}/submissions`, payload)
-
+  console.log("Resposta enviada:", response.data)
   return response.data
 }

@@ -10,6 +10,8 @@ internal sealed class SubmissionAnswerConfiguration : IEntityTypeConfiguration<S
     {
         builder.ToTable("submission_answers");
         builder.HasKey(answer => answer.Id);
+        builder.Property(answer => answer.Id)
+            .ValueGeneratedNever();
 
         builder.Property(answer => answer.AnswerText);
         builder.Property(answer => answer.AnswerJson).HasColumnType("jsonb");

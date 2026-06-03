@@ -11,6 +11,8 @@ internal sealed class SubmissionConfiguration : IEntityTypeConfiguration<Submiss
     {
         builder.ToTable("submissions");
         builder.HasKey(submission => submission.Id);
+        builder.Property(submission => submission.Id)
+            .ValueGeneratedNever();
 
         builder.Property(submission => submission.SubmittedAt).IsRequired();
         builder.Property(submission => submission.RespondentEmail).HasMaxLength(320);

@@ -98,7 +98,7 @@ export default function ResponderFormularioPage() {
         respondentUserId: null,
         answers: form.questions.map((question) => {
           const value = answers[question.id]
-
+          
           if (Array.isArray(value)) {
             return {
               questionId: question.id,
@@ -116,8 +116,10 @@ export default function ResponderFormularioPage() {
           }
         }),
       }
-
-      await createSubmission(form.id, payload)
+      
+      console.log(payload)
+      const api = await createSubmission(form.id, payload)
+      console.log("Resposta enviada:", api)
 
       setMessage("Resposta enviada com sucesso!")
       router.push(`/respostas/${form.id}/obrigado`)

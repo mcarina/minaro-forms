@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { publishForm } from "../services/Forms.service";
 import ModalPublished from "./modalPublished";
+import Link from "next/link";
 
 interface FormDropdownProps {
   formId: string
@@ -104,8 +105,10 @@ export default function FormDropdown({
           </button>
 
           <button type="button" className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition">
-            <BarChart3 className="w-4 h-4 mr-2" />
-            Ver respostas
+          <Link href={`/Respostas/${formId}`} className="flex items-center w-full">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Ver respostas
+          </Link>
           </button>
 
           <div className="h-px bg-white/10" />

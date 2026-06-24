@@ -6,6 +6,7 @@ using MinaroForms.Application.Forms.GetFormsByUser;
 using System.Security.Claims;
 using MinaroForms.Application.Submissions.GetResponsesSummary;
 using MinaroForms.Application.Submissions.GetRawResponses;
+using MinaroForms.Application.Submissions.GetResponseCharts;
 
 namespace MinaroForms.Api.Endpoints;
 
@@ -135,31 +136,57 @@ public static class FormEndpoints
         })
         .RequireAuthorization();
 
-    forms.MapGet("/{formId:guid}/responses/raw", async (
-        Guid formId,
-        ClaimsPrincipal user,
-        GetRawResponsesUseCase useCase,
-        CancellationToken cancellationToken) =>
-    {
-        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
-
-        if (userIdClaim is null)
+        forms.MapGet("/{formId:guid}/responses/raw", async (
+            Guid formId,
+            ClaimsPrincipal user,
+            GetRawResponsesUseCase useCase,
+            CancellationToken cancellationToken) =>
         {
-            return Results.Unauthorized();
-        }
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
 
-        var userId = Guid.Parse(userIdClaim.Value);
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
 
-        var responses = await useCase.ExecuteAsync(
-            formId,
-            userId,
-            cancellationToken);
+            var userId = Guid.Parse(userIdClaim.Value);
 
-        return responses is null
-            ? Results.NotFound()
-            : Results.Ok(responses);
-    })
-    .RequireAuthorization();
+            var responses = await useCase.ExecuteAsync(
+                formId,
+                userId,
+                cancellationToken);
+
+            return responses is null
+                ? Results.NotFound()
+                : Results.Ok(responses);
+        })
+        .RequireAuthorization();
+
+        forms.MapGet("/{formId:guid}/responses/charts", async (
+            Guid formId,
+            ClaimsPrincipal user,
+            GetResponseChartsUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var charts = await useCase.ExecuteAsync(
+                formId,
+                userId,
+                cancellationToken);
+
+            return charts is null
+                ? Results.NotFound()
+                : Results.Ok(charts);
+        })
+        .RequireAuthorization();
 
         return app;
     }

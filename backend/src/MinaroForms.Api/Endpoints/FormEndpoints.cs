@@ -4,6 +4,7 @@ using MinaroForms.Application.Forms.PublishForm;
 using MinaroForms.Application.Submissions.CreateSubmission;
 using MinaroForms.Application.Forms.GetFormsByUser;
 using System.Security.Claims;
+using MinaroForms.Application.Submissions.GetResponsesSummary;
 
 namespace MinaroForms.Api.Endpoints;
 
@@ -103,6 +104,33 @@ public static class FormEndpoints
             );
 
             return Results.Ok(forms);
+        })
+        .RequireAuthorization();
+
+        //se tiver muitas respostas, eu trocaria o GetByIdAsync por uma query específica no repository para não carregar perguntas
+        forms.MapGet("/{formId:guid}/responses/summary", async (
+            Guid formId,
+            ClaimsPrincipal user,
+            GetResponsesSummaryUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var summary = await useCase.ExecuteAsync(
+                formId,
+                userId,
+                cancellationToken);
+
+            return summary is null
+                ? Results.NotFound()
+                : Results.Ok(summary);
         })
         .RequireAuthorization();
 

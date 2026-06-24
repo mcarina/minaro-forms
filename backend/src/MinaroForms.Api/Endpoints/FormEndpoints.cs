@@ -5,6 +5,7 @@ using MinaroForms.Application.Submissions.CreateSubmission;
 using MinaroForms.Application.Forms.GetFormsByUser;
 using System.Security.Claims;
 using MinaroForms.Application.Submissions.GetResponsesSummary;
+using MinaroForms.Application.Submissions.GetRawResponses;
 
 namespace MinaroForms.Api.Endpoints;
 
@@ -133,6 +134,32 @@ public static class FormEndpoints
                 : Results.Ok(summary);
         })
         .RequireAuthorization();
+
+    forms.MapGet("/{formId:guid}/responses/raw", async (
+        Guid formId,
+        ClaimsPrincipal user,
+        GetRawResponsesUseCase useCase,
+        CancellationToken cancellationToken) =>
+    {
+        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim is null)
+        {
+            return Results.Unauthorized();
+        }
+
+        var userId = Guid.Parse(userIdClaim.Value);
+
+        var responses = await useCase.ExecuteAsync(
+            formId,
+            userId,
+            cancellationToken);
+
+        return responses is null
+            ? Results.NotFound()
+            : Results.Ok(responses);
+    })
+    .RequireAuthorization();
 
         return app;
     }

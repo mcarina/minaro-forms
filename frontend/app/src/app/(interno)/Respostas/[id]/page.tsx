@@ -1,5 +1,5 @@
 'use client';
-import { ArrowLeft, BarChart3, LayoutDashboard, Plus, TableIcon } from "lucide-react";
+import { ArrowLeft, BarChart3, Clock, LayoutDashboard, Plus, TableIcon, Users } from "lucide-react";
 import Link from "next/link";
 import {
   Tabs,
@@ -7,14 +7,54 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChartWidget, type DashboardWidget  } from "./components/responses";
+import { ChartWidget, type DashboardWidget } from "./components/responses";
 import { getChartableFields, sampleFields, sampleResponses } from "../lib/sample-responses";
+import { useParams } from "next/navigation";
+import { getResponsesSummary, type ResponsesSummary } from "../services/ResponsesSummary.service";
 
 const MAX_WIDGETS = 3
 
 export default function RespostasPage() {
+  const params = useParams()
+  const formId = params.id as string
+
+  const [summary, setSummary] = useState<ResponsesSummary | null>(null)
+  const [summaryLoading, setSummaryLoading] = useState(true)
+
+  useEffect(() => {
+  async function loadSummary() {
+    try {
+      setSummaryLoading(true)
+      const data = await getResponsesSummary(formId)
+      setSummary(data)
+    } catch (error) {
+      console.error("Erro ao carregar resumo das respostas:", error)
+    } finally {
+      setSummaryLoading(false)
+    }
+  }
+
+  if (formId) {
+    loadSummary()
+  }
+}, [formId])
+
+function formatLastSubmittedAt(value: string | null | undefined) {
+  if (!value) {
+    return "Nenhuma resposta"
+  }
+
+  return new Date(value).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+  // =================
   const chartableFields = getChartableFields(sampleFields)
 
   const [widgets, setWidgets] = useState<DashboardWidget[]>([
@@ -46,7 +86,7 @@ export default function RespostasPage() {
       <header className="sticky top-0 z-10 border-b border-white/10 bg-slate-900/60 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
           <button className="text-violet-200 hover:text-white hover:bg-white/10">
-            <Link href="/">
+            <Link href="/Home">
               <ArrowLeft className="w-5 h-5" />
             </Link>
           </button>
@@ -60,16 +100,35 @@ export default function RespostasPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Cards de resumo, dois cards de, total de respostas e data da ultima resposta */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div
-            className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 flex items-center gap-4"
-          >
-            <div className='w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0'>
-              {/* icone dinamico a ser decidido ainda */}
-              {/* <Icon className="w-6 h-6 text-white" /> */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shrink-0">
+              <Users className="w-6 h-6 text-white" />
             </div>
+
             <div className="min-w-0">
-              <p className="text-2xl font-bold text-white">value</p>
-              <p className="text-sm text-violet-300 truncate">label</p>
+              <p className="text-2xl font-bold text-white">
+                {summaryLoading ? "..." : summary?.totalResponses ?? 0}
+              </p>
+              <p className="text-sm text-violet-300 truncate">
+                Total de respostas
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-fuchsia-600 to-pink-600 flex items-center justify-center shrink-0">
+              <Clock className="w-6 h-6 text-white" />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-lg font-bold text-white truncate">
+                {summaryLoading
+                  ? "..."
+                  : formatLastSubmittedAt(summary?.lastSubmittedAt)}
+              </p>
+              <p className="text-sm text-violet-300 truncate">
+                Última resposta
+              </p>
             </div>
           </div>
         </div>

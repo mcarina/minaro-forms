@@ -3,7 +3,7 @@ import { api } from "@/app/services/api/Api"
 export interface ResponsesSummary {
   formId: string
   totalResponses: number
-  lastSubmittedAt: string | null
+  lastResponseDate: string | null
 }
 
 export async function getResponsesSummary(formId: string) {
@@ -43,6 +43,36 @@ export interface RawResponses {
 export async function getRawResponses(formId: string) {
   const response = await api.get<RawResponses>(
     `/forms/${formId}/responses/raw`
+  )
+
+  return response.data
+}
+
+export type ChartTypeSuggestion = "bar" | "pie" | "donut" | "line"
+
+export interface ResponseChartDataPoint {
+  label: string
+  value: number
+  percentage: number
+}
+
+export interface ResponseChartItem {
+  questionId: string
+  title: string
+  type: number
+  chartTypeSuggestion: ChartTypeSuggestion
+  totalAnswers: number
+  data: ResponseChartDataPoint[]
+}
+
+export interface ResponseCharts {
+  formId: string
+  charts: ResponseChartItem[]
+}
+
+export async function getResponseCharts(formId: string) {
+  const response = await api.get<ResponseCharts>(
+    `/forms/${formId}/responses/charts`
   )
 
   return response.data

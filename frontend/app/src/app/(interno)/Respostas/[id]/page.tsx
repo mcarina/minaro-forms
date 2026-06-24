@@ -1,5 +1,5 @@
 'use client';
-import { ArrowLeft, BarChart3, Clock, LayoutDashboard, Plus, TableIcon, Users } from "lucide-react";
+import { ArrowLeft, BarChart3, ChevronDown, ChevronUp, Clock, LayoutDashboard, Plus, TableIcon, Users } from "lucide-react";
 import Link from "next/link";
 import {
   Tabs,
@@ -10,16 +10,18 @@ import {
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartWidget, type DashboardWidget } from "./components/responses";
-import { getChartableFields, sampleFields, sampleResponses } from "../lib/sample-responses";
 import { useParams } from "next/navigation";
 import {
   getResponsesSummary,
   getRawResponses,
+  getResponseCharts,
   type ResponsesSummary,
   type RawResponses,
+  type ResponseCharts,
 } from "../services/ResponsesSummary.service";
 
 const MAX_WIDGETS = 3
+const ANSWER_PREVIEW_LIMIT = 20
 
 export default function RespostasPage() {
   const params = useParams()
@@ -29,82 +31,115 @@ export default function RespostasPage() {
   const [summaryLoading, setSummaryLoading] = useState(true)
   const [rawResponses, setRawResponses] = useState<RawResponses | null>(null)
   const [rawResponsesLoading, setRawResponsesLoading] = useState(true)
+  const [responseCharts, setResponseCharts] = useState<ResponseCharts | null>(null)
+  const [chartsLoading, setChartsLoading] = useState(true)
+  const [widgets, setWidgets] = useState<DashboardWidget[]>([])
+  const [expandedAnswers, setExpandedAnswers] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
-  async function loadSummary() {
-    try {
-      setSummaryLoading(true)
-      const data = await getResponsesSummary(formId)
-      setSummary(data)
-    } catch (error) {
-      console.error("Erro ao carregar resumo das respostas:", error)
-    } finally {
-      setSummaryLoading(false)
+    async function loadSummary() {
+      try {
+        setSummaryLoading(true)
+        const data = await getResponsesSummary(formId)
+        setSummary(data)
+      } catch (error) {
+        console.error("Erro ao carregar resumo das respostas:", error)
+      } finally {
+        setSummaryLoading(false)
+      }
     }
-  }
 
-  if (formId) {
-    loadSummary()
-  }
-}, [formId])
-
-function formatLastSubmittedAt(value: string | null | undefined) {
-  if (!value) {
-    return "Nenhuma resposta"
-  }
-
-  return new Date(value).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
-
-useEffect(() => {
-  async function loadRawResponses() {
-    try {
-      setRawResponsesLoading(true)
-      const data = await getRawResponses(formId)
-      setRawResponses(data)
-    } catch (error) {
-      console.error("Erro ao carregar respostas:", error)
-    } finally {
-      setRawResponsesLoading(false)
+    if (formId) {
+      loadSummary()
     }
+  }, [formId])
+
+  function formatLastSubmittedAt(value: string | null | undefined) {
+    if (!value) {
+      return "Nenhuma resposta"
+    }
+
+    return new Date(value).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
   }
 
-  if (formId) {
-    loadRawResponses()
+  useEffect(() => {
+    async function loadRawResponses() {
+      try {
+        setRawResponsesLoading(true)
+        const data = await getRawResponses(formId)
+        setRawResponses(data)
+      } catch (error) {
+        console.error("Erro ao carregar respostas:", error)
+      } finally {
+        setRawResponsesLoading(false)
+      }
+    }
+
+    if (formId) {
+      loadRawResponses()
+    }
+  }, [formId])
+
+  function formatSubmittedAt(value: string) {
+    return new Date(value).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
   }
-}, [formId])
 
-function formatSubmittedAt(value: string) {
-  return new Date(value).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-}
+  useEffect(() => {
+    async function loadCharts() {
+      try {
+        setChartsLoading(true)
+        const data = await getResponseCharts(formId)
+        setResponseCharts(data)
 
-  // =================
-  const chartableFields = getChartableFields(sampleFields)
+        setWidgets(
+          data.charts.slice(0, MAX_WIDGETS).map((chart) => ({
+            id: chart.questionId,
+            fieldId: chart.questionId,
+            chartType: chart.chartTypeSuggestion,
+            full: false,
+          }))
+        )
+      } catch (error) {
+        console.error("Erro ao carregar gráficos:", error)
+      } finally {
+        setChartsLoading(false)
+      }
+    }
 
-  const [widgets, setWidgets] = useState<DashboardWidget[]>([
-    { id: "w1", fieldId: "f_satisfaction", chartType: "bar", full: false },
-    { id: "w2", fieldId: "f_plan", chartType: "donut", full: false },
-  ])
+    if (formId) {
+      loadCharts()
+    }
+  }, [formId])
 
   const addWidget = () => {
     if (widgets.length >= MAX_WIDGETS) return
+
+    const charts = responseCharts?.charts ?? []
     const used = widgets.map((w) => w.fieldId)
-    const next = chartableFields.find((f) => !used.includes(f.id)) ?? chartableFields[0]
+    const next = charts.find((chart) => !used.includes(chart.questionId))
+
+    if (!next) return
+
     setWidgets([
       ...widgets,
-      { id: `w${Date.now()}`, fieldId: next.id, chartType: "bar", full: false },
+      {
+        id: next.questionId,
+        fieldId: next.questionId,
+        chartType: next.chartTypeSuggestion,
+        full: false,
+      },
     ])
   }
 
@@ -115,6 +150,17 @@ function formatSubmittedAt(value: string) {
   const removeWidget = (id: string) => {
     setWidgets((prev) => prev.filter((w) => w.id !== id))
   }
+
+  const toggleAnswerExpanded = (key: string) => {
+    setExpandedAnswers((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }))
+  }
+
+  const availableCharts = responseCharts?.charts ?? []
+  const hasAvailableCharts = availableCharts.length > 0
+  const canAddWidget = hasAvailableCharts && widgets.length < MAX_WIDGETS
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-700">
@@ -160,7 +206,7 @@ function formatSubmittedAt(value: string) {
               <p className="text-lg font-bold text-white truncate">
                 {summaryLoading
                   ? "..."
-                  : formatLastSubmittedAt(summary?.lastSubmittedAt)}
+                  :formatLastSubmittedAt(summary?.lastResponseDate)}
               </p>
               <p className="text-sm text-violet-300 truncate">
                 Última resposta
@@ -169,15 +215,8 @@ function formatSubmittedAt(value: string) {
           </div>
         </div>
 
-        <Tabs defaultValue="dashboard">
+        <Tabs defaultValue="respostas">
           <TabsList className="bg-white/5 border border-white/10">
-            <TabsTrigger
-              value="dashboard"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white text-violet-200 gap-2"
-            >
-              <LayoutDashboard />
-              Dashboard
-            </TabsTrigger>
             <TabsTrigger
               value="respostas"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white text-violet-200 gap-2"
@@ -185,8 +224,16 @@ function formatSubmittedAt(value: string) {
               <TableIcon />
               Respostas
             </TabsTrigger>
+            <TabsTrigger
+              value="dashboard"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white text-violet-200 gap-2"
+            >
+              <LayoutDashboard />
+              Dashboard
+            </TabsTrigger>
           </TabsList>
 
+          {/* charts */}
           <TabsContent value="dashboard" className="mt-6">
             <div className="flex items-center justify-between mb-5">
               <div>
@@ -195,47 +242,59 @@ function formatSubmittedAt(value: string) {
               </div>
               <button
                 onClick={addWidget}
-                disabled={widgets.length >= MAX_WIDGETS}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white gap-2 disabled:opacity-40"
+                disabled={!canAddWidget}
+                className="
+                  flex items-center gap-2
+                  rounded-xl
+                  bg-gradient-to-r from-blue-600 to-purple-600
+                  hover:from-blue-500 hover:to-purple-500
+                  text-white
+                  px-4 py-2
+                  disabled:opacity-40
+                "
               >
                 <Plus className="w-4 h-4" />
-                Adicionar gráfico
-                <span className="ml-1 rounded-md bg-white/20 px-1.5 py-0.5 text-xs">
-                  {widgets.length}/{MAX_WIDGETS}
+
+                <span>Adicionar gráfico</span>
+
+                <span className="ml-1 rounded-lg bg-white/20 px-1.5 py-0.5 text-xs">
+                  {widgets.length}/{Math.min(MAX_WIDGETS, availableCharts.length)}
                 </span>
               </button>
             </div>
 
-            {widgets.length === 0 ? (
+            {chartsLoading ? (
+              <div className="rounded-2xl border border-white/10 bg-white/5 py-12 text-center text-violet-300">
+                Carregando gráficos...
+              </div>
+            ) : widgets.length === 0 ? (
               <div className="rounded-2xl border-2 border-dashed border-white/15 bg-white/5 py-16 flex flex-col items-center text-center px-6">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-600/20 flex items-center justify-center mb-4">
                   <BarChart3 className="w-8 h-8 text-purple-400" />
                 </div>
-                <h3 className="text-white font-medium mb-1">Nenhum gráfico ainda</h3>
-                <p className="text-sm text-violet-300 mb-5 max-w-sm">
-                  Adicione gráficos para visualizar as respostas do seu formulário do jeito que preferir.
-                </p>
-                <button
-                  onClick={addWidget}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Adicionar primeiro gráfico
-                </button>
+                <h3 className="text-white font-medium mb-1">Sem graficos disponiveis</h3>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {widgets.map((w) => (
-                  <div key={w.id} className={w.full ? "md:col-span-2" : ""}>
-                    <ChartWidget
-                      widget={w}
-                      fields={chartableFields}
-                      responses={sampleResponses}
-                      onChange={updateWidget}
-                      onRemove={removeWidget}
-                    />
-                  </div>
-                ))}
+                {widgets.map((w) => {
+                  const chart = responseCharts?.charts.find(
+                    (item) => item.questionId === w.fieldId
+                  )
+
+                  if (!chart) return null
+
+                  return (
+                    <div key={w.id} className={w.full ? "md:col-span-2" : ""}>
+                      <ChartWidget
+                        widget={w}
+                        charts={responseCharts?.charts ?? []}
+                        chart={chart}
+                        onChange={updateWidget}
+                        onRemove={removeWidget}
+                      />
+                    </div>
+                  )
+                })}
               </div>
             )}
           </TabsContent>
@@ -293,10 +352,40 @@ function formatSubmittedAt(value: string) {
                             return (
                               <TableCell
                                 key={`${row.submissionId}-${column.questionId}`}
-                                className="text-violet-200 max-w-[260px] truncate"
-                                title={answer?.displayValue ?? "-"}
+                                className="text-violet-200 max-w-[320px] align-top"
                               >
-                                {answer?.displayValue ?? "-"}
+                                {(() => {
+                                  const cellKey = `${row.submissionId}-${column.questionId}`
+                                  const value = answer?.displayValue ?? "-"
+                                  const isLong = value.length > ANSWER_PREVIEW_LIMIT
+                                  const isExpanded = expandedAnswers[cellKey]
+
+                                  return (
+                                    <div className="space-y-1">
+                                      <p className={isExpanded ? "whitespace-pre-wrap break-words" : "truncate"}>
+                                        {value}
+                                      </p>
+
+                                      {isLong && (
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleAnswerExpanded(cellKey)}
+                                          className="inline-flex items-center gap-1 text-xs font-medium text-purple-300 hover:text-white"
+                                        >
+                                          {isExpanded ? (
+                                            <>
+                                              <ChevronUp className="w-3.5 h-3.5" />
+                                            </>
+                                          ) : (
+                                            <>
+                                              <ChevronDown className="w-3.5 h-3.5" />
+                                            </>
+                                          )}
+                                        </button>
+                                      )}
+                                    </div>
+                                  )
+                                })()}
                               </TableCell>
                             )
                           })}

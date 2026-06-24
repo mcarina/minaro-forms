@@ -14,11 +14,10 @@ import {
   YAxis,
 } from "recharts"
 import { BarChart3, ChartLine, ChartPie, Donut, Maximize2, Minimize2, X } from "lucide-react"
-import type { FormField } from "../../types/types"
-import { aggregateField, type ResponseRow } from "../../lib/sample-responses" 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import type { ResponseChartItem } from "../../services/ResponsesSummary.service"
 
 export type ChartType = "bar" | "pie" | "donut" | "line"
 
@@ -46,16 +45,14 @@ const CHART_TYPE_OPTIONS: { value: ChartType; label: string; icon: typeof BarCha
 
 interface ChartWidgetProps {
   widget: DashboardWidget
-  fields: FormField[]
-  responses: ResponseRow[]
+  charts: ResponseChartItem[]
+  chart: ResponseChartItem
   onChange: (widget: DashboardWidget) => void
   onRemove: (id: string) => void
 }
 
-export function ChartWidget({ widget, fields, responses, onChange, onRemove }: ChartWidgetProps) {
-  const field = fields.find((f) => f.id === widget.fieldId) ?? fields[0]
-
-  const data = useMemo(() => aggregateField(field, responses), [field, responses])
+export function ChartWidget({ widget, charts, chart, onChange, onRemove }: ChartWidgetProps) {
+  const data = chart.data
 
   const chartConfig = useMemo(() => {
     const config: Record<string, { label: string; color: string }> = {
@@ -72,14 +69,25 @@ export function ChartWidget({ widget, fields, responses, onChange, onRemove }: C
       {/* Controles do widget */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex-1 min-w-0 space-y-2">
-          <Select value={widget.fieldId} onValueChange={(v) => onChange({ ...widget, fieldId: v })}>
+          <Select
+            value={widget.fieldId}
+            onValueChange={(v) => {
+              const nextChart = charts.find((item) => item.questionId === v)
+
+              onChange({
+                ...widget,
+                fieldId: v,
+                chartType: nextChart?.chartTypeSuggestion ?? widget.chartType,
+              })
+            }}
+          >
             <SelectTrigger className="bg-white/5 border-white/10 text-white h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-slate-900 border-white/10 text-white">
-              {fields.map((f) => (
-                <SelectItem key={f.id} value={f.id} className="focus:bg-white/10 focus:text-white">
-                  {f.question}
+              {charts.map((item) => (
+                <SelectItem key={item.questionId} value={item.questionId} className="focus:bg-white/10 focus:text-white">
+                  {item.title}
                 </SelectItem>
               ))}
             </SelectContent>

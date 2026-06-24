@@ -13,3 +13,37 @@ export async function getResponsesSummary(formId: string) {
 
   return response.data
 }
+
+export interface RawResponseColumn {
+  questionId: string
+  title: string
+  type: number
+  position: number
+}
+
+export interface RawResponseAnswer {
+  questionId: string
+  value: string | null
+  displayValue: string
+}
+
+export interface RawResponseRow {
+  submissionId: string
+  submittedAt: string
+  respondentEmail: string | null
+  answers: RawResponseAnswer[]
+}
+
+export interface RawResponses {
+  formId: string
+  columns: RawResponseColumn[]
+  rows: RawResponseRow[]
+}
+
+export async function getRawResponses(formId: string) {
+  const response = await api.get<RawResponses>(
+    `/forms/${formId}/responses/raw`
+  )
+
+  return response.data
+}

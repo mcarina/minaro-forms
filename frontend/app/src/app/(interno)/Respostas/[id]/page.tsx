@@ -12,7 +12,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ChartWidget, type DashboardWidget } from "./components/responses";
 import { getChartableFields, sampleFields, sampleResponses } from "../lib/sample-responses";
 import { useParams } from "next/navigation";
-import { getResponsesSummary, type ResponsesSummary } from "../services/ResponsesSummary.service";
+import {
+  getResponsesSummary,
+  getRawResponses,
+  type ResponsesSummary,
+  type RawResponses,
+} from "../services/ResponsesSummary.service";
 
 const MAX_WIDGETS = 3
 
@@ -22,6 +27,8 @@ export default function RespostasPage() {
 
   const [summary, setSummary] = useState<ResponsesSummary | null>(null)
   const [summaryLoading, setSummaryLoading] = useState(true)
+  const [rawResponses, setRawResponses] = useState<RawResponses | null>(null)
+  const [rawResponsesLoading, setRawResponsesLoading] = useState(true)
 
   useEffect(() => {
   async function loadSummary() {
@@ -54,6 +61,35 @@ function formatLastSubmittedAt(value: string | null | undefined) {
     minute: "2-digit",
   })
 }
+
+useEffect(() => {
+  async function loadRawResponses() {
+    try {
+      setRawResponsesLoading(true)
+      const data = await getRawResponses(formId)
+      setRawResponses(data)
+    } catch (error) {
+      console.error("Erro ao carregar respostas:", error)
+    } finally {
+      setRawResponsesLoading(false)
+    }
+  }
+
+  if (formId) {
+    loadRawResponses()
+  }
+}, [formId])
+
+function formatSubmittedAt(value: string) {
+  return new Date(value).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
   // =================
   const chartableFields = getChartableFields(sampleFields)
 
@@ -211,30 +247,77 @@ function formatLastSubmittedAt(value: string | null | undefined) {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-white/10 hover:bg-transparent">
-                      <TableHead className="text-violet-300">Nome</TableHead>
-                      <TableHead className="text-violet-300">Avaliação</TableHead>
-                      <TableHead className="text-violet-300">Plano</TableHead>
-                      <TableHead className="text-violet-300">Origem</TableHead>
+                      <TableHead className="text-violet-300">Respondente</TableHead>
                       <TableHead className="text-violet-300">Data</TableHead>
+
+                      {rawResponses?.columns.map((column) => (
+                        <TableHead
+                          key={column.questionId}
+                          className="text-violet-300 min-w-[180px]"
+                        >
+                          {column.title}
+                        </TableHead>
+                      ))}
                     </TableRow>
                   </TableHeader>
+
                   <TableBody>
-                    {sampleResponses.slice(0, 15).map((r) => (
-                      <TableRow key={r.id} className="border-white/10 hover:bg-white/5">
-                        <TableCell className="text-white font-medium">{r.answers.f_name as string}</TableCell>
-                        <TableCell className="text-violet-200">{r.answers.f_satisfaction as string} / 5</TableCell>
-                        <TableCell className="text-violet-200">{r.answers.f_plan as string}</TableCell>
-                        <TableCell className="text-violet-200">{r.answers.f_source as string}</TableCell>
-                        <TableCell className="text-violet-300">
-                          {r.submittedAt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                    {rawResponsesLoading ? (
+                      <TableRow className="border-white/10">
+                        <TableCell
+                          colSpan={(rawResponses?.columns.length ?? 0) + 2}
+                          className="text-center text-violet-300 py-8"
+                        >
+                          Carregando respostas...
                         </TableCell>
                       </TableRow>
-                    ))}
+                    ) : rawResponses && rawResponses.rows.length > 0 ? (
+                      rawResponses.rows.map((row) => (
+                        <TableRow
+                          key={row.submissionId}
+                          className="border-white/10 hover:bg-white/5"
+                        >
+                          <TableCell className="text-white font-medium">
+                            {row.respondentEmail ?? "Anônimo"}
+                          </TableCell>
+
+                          <TableCell className="text-violet-300 whitespace-nowrap">
+                            {formatSubmittedAt(row.submittedAt)}
+                          </TableCell>
+
+                          {rawResponses.columns.map((column) => {
+                            const answer = row.answers.find(
+                              (item) => item.questionId === column.questionId
+                            )
+
+                            return (
+                              <TableCell
+                                key={`${row.submissionId}-${column.questionId}`}
+                                className="text-violet-200 max-w-[260px] truncate"
+                                title={answer?.displayValue ?? "-"}
+                              >
+                                {answer?.displayValue ?? "-"}
+                              </TableCell>
+                            )
+                          })}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow className="border-white/10">
+                        <TableCell
+                          colSpan={(rawResponses?.columns.length ?? 0) + 2}
+                          className="text-center text-violet-300 py-8"
+                        >
+                          Nenhuma resposta encontrada.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </div>
+
               <div className="px-4 py-3 border-t border-white/10 text-center text-xs text-violet-300">
-                Mostrando 0 de 0 respostas
+                Mostrando {rawResponses?.rows.length ?? 0} de {rawResponses?.rows.length ?? 0} respostas
               </div>
             </div>
           </TabsContent>

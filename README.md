@@ -5,7 +5,7 @@
 <img width="1863" height="938" alt="image" src="https://github.com/user-attachments/assets/cf036ba2-08da-4115-858d-3f7b32e11482" />
 
 ### Aréa Novo Formulário
-<img width="1863" height="938" alt="image" src="https://github.com/user-attachments/assets/515f3c52-9445-43e4-aba6-e1ac128af66a" />
+<img width="1852" height="932" alt="image" src="https://github.com/user-attachments/assets/512b5be2-167c-466b-b601-33c0dc528e7e" />
 
 ### Tipos de perguntas selecionados
 <img width="1863" height="938" alt="image" src="https://github.com/user-attachments/assets/ce6e5633-662a-4fdb-8e0c-18380146ec6e" />

@@ -122,7 +122,7 @@ export function FormBody({
     <main className="flex-1 p-6 overflow-y-auto">
       <div className="max-w-2xl mx-auto">
         {/* Form Header */}
-        <div className="p-6 rounded-lg border-slate-700/50 bg-slate-800/40 p-6 border-t-4 border-t-purple-500 flex flex-col gap-2">
+        <div className="p-6 mb-4 rounded-lg border-slate-700/50 bg-slate-800/40 p-6 border-t-4 border-t-purple-500 flex flex-col gap-2">
           <input
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}

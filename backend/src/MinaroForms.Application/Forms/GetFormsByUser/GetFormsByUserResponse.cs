@@ -17,4 +17,8 @@ public sealed class GetFormsByUserResponse
     public string LastUpdate { get; init; } = string.Empty;
 
     public bool IsFavorite { get; init; }
+
+    public bool HasResponses { get; set; }
+    
+    public bool CanEditStructure { get; set; }
 }

@@ -8,10 +8,19 @@ import { FormBody } from "./formBody";
 import Header from "./header";
 import { PropertiesPanel } from "./PropertiesPanel";
 import { getMe } from "../../Meu-Perfil/services/getUserId.service";
-import { createForm } from "../services/createform.service";
-import { useRouter } from "next/navigation"
+import { createForm, replaceFormStructure } from "../services/createform.service";
+import { getFormById } from "../../Formulario/services/getforms.service";
+import { useRouter } from "next/navigation";
 
-export default function FormEditor() {
+interface FormEditorProps {
+  mode?: "create" | "editStructure"
+  formId?: string
+}
+
+export default function FormEditor({
+  mode = "create",
+  formId,
+}: FormEditorProps) {
     const router = useRouter()
     const [title, setTitle] = useState("Novo Formulário")
     const [description, setDescription] = useState("")
@@ -42,6 +51,62 @@ export default function FormEditor() {
 
         loadUser()
     }, [])
+
+    useEffect(() => {
+        async function loadFormForEditing() {
+            if (mode !== "editStructure" || !formId) return
+
+            try {
+                const form = await getFormById(formId)
+
+                if (!form.canEditStructure) {
+                    router.push(`/Formulario/editar/${formId}`)
+                    return
+                }
+
+                setTitle(form.title)
+                setDescription(form.description ?? "")
+
+                setFields(
+                    form.questions
+                        .sort((a: { position: number }, b: { position: number }) => a.position - b.position)
+                        .map((question: {
+                            id: string
+                            type: 1 | 2 | 4 | 5 | 6 | 7
+                            title: string
+                            description: string | null
+                            isRequired: boolean
+                            options: {
+                                id: string
+                                label: string
+                                value: string
+                                position: number
+                            }[]
+                        }) => ({
+                            id: question.id,
+                            type: apiTypeToFieldType[question.type],
+                            question: question.title,
+                            description: question.description ?? undefined,
+                            required: question.isRequired,
+                            options:
+                                question.options?.length > 0
+                                    ? question.options
+                                        .sort((a, b) => a.position - b.position)
+                                        .map((option) => ({
+                                            id: option.id,
+                                            label: option.label,
+                                            value: option.value,
+                                        }))
+                                    : undefined,
+                        }))
+                )
+            } catch (error) {
+                console.error("Erro ao carregar formulário para edição:", error)
+            }
+        }
+
+        loadFormForEditing()
+    }, [mode, formId, router])
 
     const createNewField = useCallback((type: FieldType): FormField => {
         const fieldType = FIELD_TYPES.find((f) => f.type === type)
@@ -128,27 +193,46 @@ export default function FormEditor() {
         date: 7,
     } as const
 
+    const apiTypeToFieldType = {
+        1: "short_text",
+        2: "long_text",
+        4: "multiple_choice",
+        5: "email",
+        6: "number",
+        7: "date",
+    } as const
+
     const buildPayload = () => {
-        if (!ownerUserId) {
-            throw new Error("Usuário não encontrado")
+        if (mode === "create" && !ownerUserId) {
+        throw new Error("Usuário não encontrado")
+        }
+
+        const questions = fields.map((field) => ({
+        type: questionTypeMap[field.type],
+        title: field.question,
+        description: field.description || null,
+        isRequired: field.required,
+        settings: null,
+        options:
+            field.options?.map((option) => ({
+            label: option.label,
+            value: option.value,
+            })) ?? null,
+        }))
+
+        if (mode === "editStructure") {
+        return {
+            title,
+            description: description || null,
+            questions,
+        }
         }
 
         return {
-            ownerUserId,
-            title,
-            description: description || null,
-            questions: fields.map((field) => ({
-                type: questionTypeMap[field.type],
-                title: field.question,
-                description: field.description || null,
-                isRequired: field.required,
-                settings: null,
-                options:
-                    field.options?.map((option) => ({
-                        label: option.label,
-                        value: option.value,
-                    })) ?? null,
-            })),
+        ownerUserId: ownerUserId!,
+        title,
+        description: description || null,
+        questions,
         }
     }
 
@@ -157,9 +241,19 @@ export default function FormEditor() {
             setSaving(true)
 
             const payload = buildPayload()
-            const createdForm = await createForm(payload)
+
+            if (mode === "editStructure") {
+            if (!formId) {
+                throw new Error("Formulário não encontrado")
+            }
+
+            await replaceFormStructure(formId, payload)
             router.push("/Home")
-            console.log("Formulário salvo:")
+            return
+            }
+
+            await createForm(payload)
+            router.push("/Home")
             
         } catch (error) {
             console.error("Erro ao salvar formulário:", error)

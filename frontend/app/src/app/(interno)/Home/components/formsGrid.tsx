@@ -21,6 +21,8 @@ interface Form {
     isFavorite: boolean
     isPublished: boolean
     shareUrl: string | null
+    canEditStructure: boolean
+    hasResponses: boolean
 }
 
 export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
@@ -107,6 +109,7 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
                                     formId={form.id}
                                     isPublished={form.isPublished}
                                     shareUrl={form.shareUrl}
+                                    canEditStructure={form.canEditStructure}
                                     onDelete={() => deleteForm(form.id)}
                                     onDuplicate={duplicateFormCard}
                                     onPublishedChange={updatePublishState}

@@ -22,6 +22,28 @@ public sealed class FormRepository(FormsDbContext dbContext) : IFormRepository
             .FirstOrDefaultAsync(form => form.Id == id, cancellationToken);
     }
 
+    public Task<Form?> GetByIdForStructureEditAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return dbContext.Forms
+            .Include(form => form.Submissions)
+            .FirstOrDefaultAsync(form => form.Id == id, cancellationToken);
+    }
+
+    public async Task DeleteStructureAsync(Guid formId, CancellationToken cancellationToken = default)
+    {
+        var questionIds = dbContext.Questions
+            .Where(question => question.FormId == formId)
+            .Select(question => question.Id);
+
+        await dbContext.QuestionOptions
+            .Where(option => questionIds.Contains(option.QuestionId))
+            .ExecuteDeleteAsync(cancellationToken);
+
+        await dbContext.Questions
+            .Where(question => question.FormId == formId)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
+
     public async Task<List<GetFormsByUserResponse>> GetByUserIdAsync(
         Guid userId,
         CancellationToken cancellationToken = default)
@@ -46,7 +68,11 @@ public sealed class FormRepository(FormsDbContext dbContext) : IFormRepository
                 LastUpdate = form.UpdatedAt
                     .ToString("dd/MM/yyyy"),
 
-                IsFavorite = false
+                IsFavorite = false,
+
+                HasResponses = form.Submissions.Count > 0,
+                
+                CanEditStructure = form.Submissions.Count == 0,
             })
             .ToListAsync(cancellationToken);
     }

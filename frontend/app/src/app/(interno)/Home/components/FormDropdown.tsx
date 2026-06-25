@@ -83,8 +83,10 @@ export default function FormDropdown({
         <div className="absolute right-0 mt-2 w-52 rounded-xl border border-white/10 bg-slate-800 shadow-xl overflow-hidden z-50">
 
           <button type="button" className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition">
-            <PenLine className="w-4 h-4 mr-2" />
-            Editar
+            <Link href={`/Formulario/editar/${formId}`} className="flex items-center w-full">
+              <PenLine className="w-4 h-4 mr-2" />
+                Editar
+            </Link>
           </button>
 
           <button type="button" className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition">

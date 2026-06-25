@@ -30,8 +30,8 @@ export default function Header({ title, fieldsCount, onTitleChange, onSave, savi
                             className="bg-transparent text-lg font-semibold text-white border-none outline-none focus:ring-0"
                         />
                         <p className="text-xs text-slate-500">
-                            {fieldsCount} {fieldsCount === 1 ? "campo" : "campos"}
-                            adicionados
+                            {fieldsCount} {fieldsCount === 1 ? "campo " : "campos "}
+                            adicionado
                         </p>
                     </div>
                 </div>

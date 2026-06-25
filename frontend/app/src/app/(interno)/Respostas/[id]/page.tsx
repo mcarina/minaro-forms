@@ -173,7 +173,7 @@ export default function RespostasPage() {
             </Link>
           </button>
           <div className="min-w-0">
-            <h1 className="text-white font-semibold truncate">Pesquisa de Satisfação</h1>
+            <h1 className="text-white font-semibold truncate">Vizualizar Respostas</h1>
           </div>
         </div>
       </header>

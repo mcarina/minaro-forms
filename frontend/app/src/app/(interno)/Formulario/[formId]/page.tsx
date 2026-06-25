@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { getFormById } from "../services/getforms.service"
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 interface ApiOption {
   id: string
@@ -66,15 +68,30 @@ export default function FormularioPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/70 to-slate-900 p-8 text-white">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/70 to-slate-900 text-white">
+        <header className="h-16 bg-slate-900/80 backdrop-blur-sm border-b border-slate-700/50 flex items-center justify-between px-4 mb-8 sticky">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/Home"
+              className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+
+            <div>
+              <h1 className="text-lg font-semibold text-white">Vizualizar formulário</h1>
+            </div>
+          </div>
+        </header>
       <div className="mx-auto max-w-2xl space-y-6">
-        <header className="rounded-lg border border-purple-500/30 bg-gradient-to-r from-slate-900/80 to-purple-900/60 p-6">
+
+        <div className="rounded-lg border border-purple-500/30 bg-gradient-to-r from-slate-900/80 to-purple-900/60 p-6">
           <h1 className="text-2xl font-bold">{form.title}</h1>
 
           {form.description && (
             <p className="mt-2 text-slate-300">{form.description}</p>
           )}
-        </header>
+        </div>
 
         <div className="space-y-4">
           {form.questions

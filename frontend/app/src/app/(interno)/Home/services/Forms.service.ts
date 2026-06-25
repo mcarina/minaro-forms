@@ -23,3 +23,15 @@ export async function publishForm(formId: string, payload: PublishFormPayload) {
 
   return response.data
 }
+
+interface DuplicateFormPayload {
+  title?: string | null
+}
+
+export async function duplicateForm(
+  formId: string,
+  payload: DuplicateFormPayload = {}
+) {
+  const response = await api.post(`/forms/${formId}/duplicate`, payload)
+  return response.data
+}

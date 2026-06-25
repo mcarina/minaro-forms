@@ -2,8 +2,8 @@
 import { Clock, Star, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import FormDropdown from "./FormDropdown";
-import { getForms } from "../services/Forms.service";
-import { useRouter } from "next/navigation"
+import { duplicateForm, getForms } from "../services/Forms.service";
+import { useRouter } from "next/navigation";
 
 export type FormFilter = "all" | "favorites" | "recent"
 
@@ -71,6 +71,12 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
         } loadForms()
     }, [])
 
+    const duplicateFormCard = async (id: string) => {
+        const duplicated = await duplicateForm(id)
+
+        setForms((prev) => [duplicated, ...prev])
+    }
+
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {visibleForms.map((form) => (
@@ -102,6 +108,7 @@ export default function FormsGrid({ searchQuery, filter }: FormsGridProps) {
                                     isPublished={form.isPublished}
                                     shareUrl={form.shareUrl}
                                     onDelete={() => deleteForm(form.id)}
+                                    onDuplicate={duplicateFormCard}
                                     onPublishedChange={updatePublishState}
                                 />
                             </div>

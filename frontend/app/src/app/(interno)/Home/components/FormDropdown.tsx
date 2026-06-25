@@ -23,6 +23,7 @@ interface FormDropdownProps {
     isPublished: boolean,
     shareUrl: string | null
   ) => void
+  onDuplicate: (formId: string) => Promise<void>
 }
 
 export default function FormDropdown({
@@ -31,6 +32,7 @@ export default function FormDropdown({
   shareUrl,
   onDelete,
   onPublishedChange,
+  onDuplicate,
 }: FormDropdownProps) {
   const [open, setOpen] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false)
@@ -38,6 +40,7 @@ export default function FormDropdown({
   const [currentShareUrl, setCurrentShareUrl] = useState(shareUrl)
   const [currentIsPublished, setCurrentIsPublished] = useState(isPublished)
   const [message, setMessage] = useState("")
+  const [duplicating, setDuplicating] = useState(false)
 
   const handlePublishToggle = async () => {
     try {
@@ -69,6 +72,21 @@ export default function FormDropdown({
     await navigator.clipboard.writeText(currentShareUrl)
     setMessage("Link copiado!")
   }
+
+  const handleDuplicate = async () => {
+    try {
+      setDuplicating(true)
+      setMessage("")
+      await onDuplicate(formId)
+      setOpen(false)
+    } catch (error) {
+      console.error(error)
+      setMessage("Erro ao duplicar formulário.")
+    } finally {
+      setDuplicating(false)
+    }
+  }
+
   return (
     <div className="relative">
       <button
@@ -89,9 +107,14 @@ export default function FormDropdown({
             </Link>
           </button>
 
-          <button type="button" className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition">
+          <button
+            type="button"
+            onClick={handleDuplicate}
+            disabled={duplicating}
+            className="w-full flex items-center px-4 py-3 text-violet-100 hover:bg-white/10 transition disabled:opacity-50"
+          >
             <Copy className="w-4 h-4 mr-2" />
-            Duplicar
+            {duplicating ? "Duplicando..." : "Duplicar"}
           </button>
 
           <button

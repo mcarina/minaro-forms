@@ -22,6 +22,8 @@ using MinaroForms.Application.Forms.GetFormsByUser;
 using MinaroForms.Application.Submissions.GetResponsesSummary;
 using MinaroForms.Application.Submissions.GetRawResponses;
 using MinaroForms.Application.Submissions.GetResponseCharts;
+using MinaroForms.Application.Forms.PatchForm;
+using MinaroForms.Application.Forms.DuplicateForm;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +41,8 @@ builder.Services.AddScoped<GetFormsByUserUseCase>();
 builder.Services.AddScoped<GetResponsesSummaryUseCase>();
 builder.Services.AddScoped<GetRawResponsesUseCase>();
 builder.Services.AddScoped<GetResponseChartsUseCase>();
+builder.Services.AddScoped<PatchFormUseCase>();
+builder.Services.AddScoped<DuplicateFormUseCase>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

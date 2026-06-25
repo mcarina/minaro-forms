@@ -96,4 +96,20 @@ public sealed class Form
 
         return value.Trim();
     }
+
+    public void Patch(string? title, string? description)
+    {
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            Title = RequireText(title, nameof(title));
+        }
+
+        if (description is not null)
+        {
+            Description = description;
+        }
+
+        Touch();
+    }
+
 }

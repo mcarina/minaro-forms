@@ -58,4 +58,32 @@ public sealed class Question
 
         return value.Trim();
     }
+
+    public void Patch(
+        string? title,
+        string? description,
+        bool? isRequired,
+        string? settingsJson)
+    {
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            Title = RequireText(title, nameof(title));
+        }
+
+        if (description is not null)
+        {
+            Description = description;
+        }
+
+        if (isRequired.HasValue)
+        {
+            IsRequired = isRequired.Value;
+        }
+
+        if (settingsJson is not null)
+        {
+            SettingsJson = settingsJson;
+        }
+    }
+
 }

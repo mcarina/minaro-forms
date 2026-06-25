@@ -30,4 +30,18 @@ public sealed class QuestionOption
 
         return value.Trim();
     }
+
+    public void Patch(string? label, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(label))
+        {
+            Label = RequireText(label, nameof(label));
+        }
+
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            Value = RequireText(value, nameof(value));
+        }
+    }
+
 }

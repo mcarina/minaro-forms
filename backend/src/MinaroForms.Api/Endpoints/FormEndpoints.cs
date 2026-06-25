@@ -7,6 +7,8 @@ using System.Security.Claims;
 using MinaroForms.Application.Submissions.GetResponsesSummary;
 using MinaroForms.Application.Submissions.GetRawResponses;
 using MinaroForms.Application.Submissions.GetResponseCharts;
+using MinaroForms.Application.Forms.PatchForm;
+using MinaroForms.Application.Forms.DuplicateForm;
 
 namespace MinaroForms.Api.Endpoints;
 
@@ -185,6 +187,62 @@ public static class FormEndpoints
             return charts is null
                 ? Results.NotFound()
                 : Results.Ok(charts);
+        })
+        .RequireAuthorization();
+
+        forms.MapPatch("/{formId:guid}", async (
+            Guid formId,
+            PatchFormRequest request,
+            ClaimsPrincipal user,
+            PatchFormUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var form = await useCase.ExecuteAsync(
+                formId,
+                userId,
+                request,
+                cancellationToken);
+
+            return form is null
+                ? Results.NotFound()
+                : Results.Ok(form);
+        })
+        .RequireAuthorization();
+
+        forms.MapPost("/{formId:guid}/duplicate", async (
+            Guid formId,
+            DuplicateFormRequest request,
+            ClaimsPrincipal user,
+            DuplicateFormUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var copy = await useCase.ExecuteAsync(
+                formId,
+                userId,
+                request,
+                cancellationToken);
+
+            return copy is null
+                ? Results.NotFound()
+                : Results.Created($"/api/forms/{copy.Id}", copy);
         })
         .RequireAuthorization();
 

@@ -30,7 +30,7 @@
 <img width="1852" height="932" alt="image" src="https://github.com/user-attachments/assets/e96feb83-34ad-43dd-9d2a-ed7e361065be" />
 <img width="1852" height="932" alt="image" src="https://github.com/user-attachments/assets/26900e69-dd08-4136-b95f-2bb117cfcd0f" />
 
-### Vizuliazao do Formulário, sem edição, apos ser publicado
+### Visualização do Formulário, sem edição, apos ser publicado
 <img width="1852" height="932" alt="image" src="https://github.com/user-attachments/assets/34f67d3d-854c-49de-8215-0d9d3cc9cf1e" />
 
 ### 

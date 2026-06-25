@@ -16,7 +16,7 @@
 ### Metódo Editar, caso já tenha respostas
 <img width="1842" height="715" alt="image" src="https://github.com/user-attachments/assets/e339c874-48a5-4db5-99e5-90f3e4164a3f" />
 
-### Metódo Editar, caso ainda não tenha respostas ou seja um formulário duplicado
+### Metódo Editar, caso ainda não tenha respostas ou caso seja um formulário duplicado
 <img width="1852" height="932" alt="image" src="https://github.com/user-attachments/assets/6d897a47-a47a-44d9-95dd-50a97a3fa5b9" />
 
 ### Metódo compartilhar

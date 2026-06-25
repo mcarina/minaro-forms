@@ -112,4 +112,49 @@ public sealed class Form
         Touch();
     }
 
+    public void ReplaceStructure(
+        string title,
+        string? description,
+        IEnumerable<QuestionDraft> questions)
+    {
+        if (_submissions.Count > 0)
+        {
+            throw new InvalidOperationException("Cannot change form structure after receiving submissions.");
+        }
+
+        Title = RequireText(title, nameof(title));
+        Description = description;
+
+        _questions.Clear();
+
+        foreach (var questionDraft in questions)
+        {
+            var question = AddQuestion(
+                questionDraft.Type,
+                questionDraft.Title,
+                questionDraft.Description,
+                questionDraft.IsRequired,
+                questionDraft.SettingsJson);
+
+            foreach (var optionDraft in questionDraft.Options)
+            {
+                question.AddOption(optionDraft.Label, optionDraft.Value);
+            }
+        }
+
+        Touch();
+    }
+
+    public sealed record QuestionDraft(
+        QuestionType Type,
+        string Title,
+        string? Description,
+        bool IsRequired,
+        string? SettingsJson,
+        IReadOnlyCollection<QuestionOptionDraft> Options);
+
+    public sealed record QuestionOptionDraft(
+        string Label,
+        string Value);
+
 }

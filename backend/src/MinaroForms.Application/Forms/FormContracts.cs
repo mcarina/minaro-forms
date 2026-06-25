@@ -11,6 +11,8 @@ public sealed record FormResponse(
     string? ShareUrl,
     DateTimeOffset CreatedAt,
     DateTimeOffset UpdatedAt,
+    bool HasResponses,
+    bool CanEditStructure,
     IReadOnlyCollection<QuestionResponse> Questions);
 
 public sealed record QuestionResponse(
@@ -29,6 +31,8 @@ public static class FormMapping
 {
     public static FormResponse ToResponse(Form form)
     {
+        var hasResponses = form.Submissions.Count > 0;
+
         return new FormResponse(
             form.Id,
             form.OwnerUserId,
@@ -38,6 +42,8 @@ public static class FormMapping
             form.ShareUrl,
             form.CreatedAt,
             form.UpdatedAt,
+            hasResponses,
+            !hasResponses,
             form.Questions
                 .OrderBy(question => question.Position)
                 .Select(question => new QuestionResponse(
@@ -50,7 +56,11 @@ public static class FormMapping
                     question.SettingsJson,
                     question.Options
                         .OrderBy(option => option.Position)
-                        .Select(option => new QuestionOptionResponse(option.Id, option.Label, option.Value, option.Position))
+                        .Select(option => new QuestionOptionResponse(
+                            option.Id,
+                            option.Label,
+                            option.Value,
+                            option.Position))
                         .ToArray()))
                 .ToArray());
     }

@@ -9,6 +9,7 @@ using MinaroForms.Application.Submissions.GetRawResponses;
 using MinaroForms.Application.Submissions.GetResponseCharts;
 using MinaroForms.Application.Forms.PatchForm;
 using MinaroForms.Application.Forms.DuplicateForm;
+using MinaroForms.Application.Forms.ReplaceFormStructure;
 
 namespace MinaroForms.Api.Endpoints;
 
@@ -243,6 +244,45 @@ public static class FormEndpoints
             return copy is null
                 ? Results.NotFound()
                 : Results.Created($"/api/forms/{copy.Id}", copy);
+        })
+        .RequireAuthorization();
+
+        forms.MapPut("/{formId:guid}/structure", async (
+            Guid formId,
+            ReplaceFormStructureRequest request,
+            ClaimsPrincipal user,
+            ReplaceFormStructureUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            try
+            {
+                var form = await useCase.ExecuteAsync(
+                    formId,
+                    userId,
+                    request,
+                    cancellationToken);
+
+                return form is null
+                    ? Results.NotFound()
+                    : Results.Ok(form);
+            }
+            catch (InvalidOperationException exception)
+            {
+                return Results.Conflict(new { error = exception.Message });
+            }
+            catch (ArgumentException exception)
+            {
+                return Results.BadRequest(new { error = exception.Message });
+            }
         })
         .RequireAuthorization();
 

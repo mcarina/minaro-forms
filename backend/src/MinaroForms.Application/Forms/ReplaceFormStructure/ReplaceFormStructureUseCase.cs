@@ -21,8 +21,14 @@ public sealed class ReplaceFormStructureUseCase(
             return null;
         }
 
+        if (form.Submissions.Count > 0)
+        {
+            throw new InvalidOperationException("Cannot change form structure after receiving submissions.");
+        }
+
         var questions = request.Questions
             .Select(question => new Form.QuestionDraft(
+                question.Id,
                 question.Type,
                 question.Title,
                 question.Description,
@@ -30,6 +36,7 @@ public sealed class ReplaceFormStructureUseCase(
                 question.Settings?.GetRawText(),
                 (question.Options ?? [])
                     .Select(option => new Form.QuestionOptionDraft(
+                        option.Id,
                         option.Label,
                         option.Value))
                     .ToArray()))

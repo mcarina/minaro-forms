@@ -11,6 +11,8 @@ internal sealed class FormConfiguration : IEntityTypeConfiguration<Form>
     {
         builder.ToTable("forms");
         builder.HasKey(form => form.Id);
+        builder.Property(form => form.Id)
+            .ValueGeneratedNever();
 
         builder.Property(form => form.OwnerUserId).IsRequired();
         builder.Property(form => form.Title).HasMaxLength(200).IsRequired();

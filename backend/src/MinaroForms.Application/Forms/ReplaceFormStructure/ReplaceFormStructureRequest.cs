@@ -9,6 +9,7 @@ public sealed record ReplaceFormStructureRequest(
     IReadOnlyCollection<ReplaceQuestionRequest> Questions);
 
 public sealed record ReplaceQuestionRequest(
+    Guid? Id,
     QuestionType Type,
     string Title,
     string? Description,
@@ -17,5 +18,6 @@ public sealed record ReplaceQuestionRequest(
     IReadOnlyCollection<ReplaceQuestionOptionRequest>? Options);
 
 public sealed record ReplaceQuestionOptionRequest(
+    Guid? Id,
     string Label,
     string Value);

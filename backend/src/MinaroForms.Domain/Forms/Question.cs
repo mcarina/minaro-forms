@@ -49,6 +49,66 @@ public sealed class Question
         return option;
     }
 
+    internal void UpdateStructure(
+        QuestionType type,
+        string title,
+        string? description,
+        bool isRequired,
+        int position,
+        string? settingsJson)
+    {
+        Type = type;
+        Title = RequireText(title, nameof(title));
+        Description = description;
+        IsRequired = isRequired;
+        Position = position;
+        SettingsJson = settingsJson;
+    }
+
+    internal void ReplaceOptions(IReadOnlyCollection<Form.QuestionOptionDraft> options)
+    {
+        if (Type is not QuestionType.SingleChoice and not QuestionType.MultipleChoice)
+        {
+            ClearOptions();
+            return;
+        }
+
+        var incomingIds = options
+            .Where(option => option.Id.HasValue)
+            .Select(option => option.Id!.Value)
+            .ToHashSet();
+
+        foreach (var option in _options.Where(option => !incomingIds.Contains(option.Id)).ToArray())
+        {
+            _options.Remove(option);
+        }
+
+        var position = 1;
+
+        foreach (var optionDraft in options)
+        {
+            var option = optionDraft.Id.HasValue
+                ? _options.FirstOrDefault(existingOption => existingOption.Id == optionDraft.Id.Value)
+                : null;
+
+            if (option is null)
+            {
+                option = AddOption(optionDraft.Label, optionDraft.Value);
+            }
+
+            option.Update(optionDraft.Label, optionDraft.Value, position);
+            position++;
+        }
+    }
+
+    internal void ClearOptions()
+    {
+        foreach (var option in _options.ToArray())
+        {
+            _options.Remove(option);
+        }
+    }
+
     private static string RequireText(string value, string paramName)
     {
         if (string.IsNullOrWhiteSpace(value))

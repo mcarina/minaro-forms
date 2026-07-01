@@ -44,4 +44,11 @@ public sealed class QuestionOption
         }
     }
 
+    internal void Update(string label, string value, int position)
+    {
+        Label = RequireText(label, nameof(label));
+        Value = RequireText(value, nameof(value));
+        Position = position;
+    }
+
 }

@@ -10,6 +10,8 @@ internal sealed class QuestionConfiguration : IEntityTypeConfiguration<Question>
     {
         builder.ToTable("questions");
         builder.HasKey(question => question.Id);
+        builder.Property(question => question.Id)
+            .ValueGeneratedNever();
 
         builder.Property(question => question.Type)
             .HasConversion<string>()

@@ -125,27 +125,53 @@ public sealed class Form
         Title = RequireText(title, nameof(title));
         Description = description;
 
-        _questions.Clear();
+        var questionDrafts = questions.ToArray();
 
-        foreach (var questionDraft in questions)
+        var incomingIds = questionDrafts
+            .Where(question => question.Id.HasValue)
+            .Select(question => question.Id!.Value)
+            .ToHashSet();
+
+        foreach (var question in _questions.Where(question => !incomingIds.Contains(question.Id)).ToArray())
         {
-            var question = AddQuestion(
+            _questions.Remove(question);
+        }
+
+        var position = 1;
+
+        foreach (var questionDraft in questionDrafts)
+        {
+            var question = questionDraft.Id.HasValue
+                ? _questions.FirstOrDefault(existingQuestion => existingQuestion.Id == questionDraft.Id.Value)
+                : null;
+
+            if (question is null)
+            {
+                question = AddQuestion(
+                    questionDraft.Type,
+                    questionDraft.Title,
+                    questionDraft.Description,
+                    questionDraft.IsRequired,
+                    questionDraft.SettingsJson);
+            }
+
+            question.UpdateStructure(
                 questionDraft.Type,
                 questionDraft.Title,
                 questionDraft.Description,
                 questionDraft.IsRequired,
+                position,
                 questionDraft.SettingsJson);
 
-            foreach (var optionDraft in questionDraft.Options)
-            {
-                question.AddOption(optionDraft.Label, optionDraft.Value);
-            }
+            question.ReplaceOptions(questionDraft.Options);
+            position++;
         }
 
         Touch();
     }
 
     public sealed record QuestionDraft(
+        Guid? Id,
         QuestionType Type,
         string Title,
         string? Description,
@@ -154,7 +180,33 @@ public sealed class Form
         IReadOnlyCollection<QuestionOptionDraft> Options);
 
     public sealed record QuestionOptionDraft(
+        Guid? Id,
         string Label,
         string Value);
+
+    public Form Duplicate(Guid ownerUserId, string title)
+    {
+        var copy = new Form(
+            ownerUserId,
+            RequireText(title, nameof(title)),
+            Description);
+
+        foreach (var originalQuestion in _questions.OrderBy(question => question.Position))
+        {
+            var copiedQuestion = copy.AddQuestion(
+                originalQuestion.Type,
+                originalQuestion.Title,
+                originalQuestion.Description,
+                originalQuestion.IsRequired,
+                originalQuestion.SettingsJson);
+
+            foreach (var originalOption in originalQuestion.Options.OrderBy(option => option.Position))
+            {
+                copiedQuestion.AddOption(originalOption.Label, originalOption.Value);
+            }
+        }
+
+        return copy;
+    }
 
 }

@@ -27,11 +27,13 @@ export async function createForm(payload: CreateFormPayload) {
 }
 
 export interface ReplaceFormStructureOption {
+  id?: string
   label: string
   value: string
 }
 
 export interface ReplaceFormStructureQuestion {
+  id?: string
   type: number
   title: string
   description: string | null

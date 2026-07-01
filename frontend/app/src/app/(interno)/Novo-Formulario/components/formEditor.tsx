@@ -30,6 +30,8 @@ export default function FormEditor({
     const selectedField = fields.find((f) => f.id === selectedFieldId) || null
     const [ownerUserId, setOwnerUserId] = useState<string | null>(null)
     const [saving, setSaving] = useState(false)
+    const isPersistedId = (id: string) =>
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -208,6 +210,7 @@ export default function FormEditor({
         }
 
         const questions = fields.map((field) => ({
+        id: isPersistedId(field.id) ? field.id : undefined,
         type: questionTypeMap[field.type],
         title: field.question,
         description: field.description || null,
@@ -215,6 +218,7 @@ export default function FormEditor({
         settings: null,
         options:
             field.options?.map((option) => ({
+            id: isPersistedId(option.id) ? option.id : undefined,
             label: option.label,
             value: option.value,
             })) ?? null,
